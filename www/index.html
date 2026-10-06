@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#030710"/>
+<title>PEGASUS · Operator — Simulasi Edukatif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030710;--bg2:#050B15;--panel:#081120;--panel2:#0C1A2E;
+  --line:rgba(0,190,255,.13);--line2:rgba(0,210,255,.30);
+  --neon:#00E5FF;--tx:#DFF2FC;--tx2:#8FB2CB;--tx3:#4E6E88;
+  --ok:#2EE59D;--red:#FF4D6A;--amber:#FFB35C;--orange:#FF9F43;--teal:#39D3E6;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--disp:'Space Grotesk',sans-serif;
+}
+html,body{height:100%}
+body{background:#010307;color:var(--tx);font:14px/1.5 var(--sans);overflow:hidden;
+  -webkit-tap-highlight-color:transparent;user-select:none;overscroll-behavior:none}
+input{user-select:text;-webkit-user-select:text}
+[hidden]{display:none!important}
+button{font-family:var(--sans);color:inherit;background:none;border:none;cursor:pointer}
+svg{flex-shrink:0}
+.mono{font-family:var(--mono)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(0,229,255,.3)}
+.device{position:relative;height:100vh;height:100dvh;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+@media(min-width:640px){
+  body{display:flex;align-items:center;justify-content:center}
+  .device{width:424px;height:min(890px,95vh);border-radius:32px;border:1px solid var(--line2);
+    box-shadow:0 0 70px rgba(0,229,255,.10),0 40px 90px rgba(0,0,0,.75)}
+}
+.rip{position:relative;overflow:hidden}
+.rd{position:absolute;border-radius:50%;background:rgba(0,229,255,.22);transform:scale(0);animation:rd .55s ease-out;pointer-events:none}
+@keyframes rd{to{transform:scale(1);opacity:0}}
+
+/* ============ LOGIN ============ */
+#login-root{position:fixed;inset:0;z-index:500;background:#010409;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;transition:opacity .6s}
+#lg-canvas{position:absolute;inset:0;width:100%;height:100%}
+.lg-card{position:relative;width:min(360px,100%);text-align:center;animation:lgIn .7s cubic-bezier(.2,.8,.25,1)}
+@keyframes lgIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.lg-logo{filter:drop-shadow(0 0 22px rgba(0,229,255,.55));animation:lgFloat 5s ease-in-out infinite}
+@keyframes lgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.lg-card h1{font:700 34px var(--disp);letter-spacing:.3em;margin:14px 0 0;text-indent:.3em;text-shadow:0 0 24px rgba(0,229,255,.5)}
+.lg-sub{font:600 9px var(--mono);letter-spacing:.32em;color:var(--neon);margin-top:6px;text-indent:.32em}
+.lg-line{width:150px;height:1px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--neon),transparent)}
+.field{margin-bottom:12px;text-align:left}
+.field label{display:block;font:600 9px var(--mono);letter-spacing:.18em;color:var(--tx3);margin-bottom:6px}
+.f-wrap{position:relative}
+.field input,.field select{width:100%;background:rgba(8,17,32,.85);border:1px solid var(--line2);border-radius:12px;padding:12px 40px 12px 13px;color:var(--tx);font:400 14px var(--sans);outline:none;transition:.15s}
+.field input:focus,.field select:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,229,255,.12)}
+.f-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--tx3)}
+.lg-err{min-height:18px;font:500 11px var(--mono);color:var(--red);margin:2px 0 8px}
+.lg-card.shake{animation:shk .4s}
+@keyframes shk{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border-radius:12px;font:600 13px var(--sans);border:1px solid var(--line2);color:var(--tx);background:var(--panel2);transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--neon);border-color:var(--neon);color:#021018;box-shadow:0 4px 18px rgba(0,229,255,.35),0 0 22px rgba(0,229,255,.18)}
+.btn.gh{background:transparent}
+.btn.dng{color:var(--red);border-color:rgba(255,77,106,.4)}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn.sm{height:34px;padding:0 12px;font-size:12px;border-radius:10px}
+.lg-hint{font:500 10px var(--mono);color:var(--tx3);margin-top:16px;letter-spacing:.06em}
+.lg-hint b{color:var(--tx2);font-weight:500}
+.lg-boot{position:absolute;inset:0;background:#010409;display:flex;align-items:center;justify-content:center;z-index:2}
+.lg-boot pre{font:400 11.5px/2.1 var(--mono);color:var(--neon);text-shadow:0 0 10px rgba(0,229,255,.5)}
+#login-root.gone{opacity:0;pointer-events:none}
+
+/* ============ CHROME APP ============ */
+.sb{display:flex;align-items:center;gap:10px;padding:calc(7px + env(safe-area-inset-top)) 16px 6px;background:var(--bg2);border-bottom:1px solid var(--line);font:600 10.5px var(--mono);color:var(--tx2)}
+.c2chip{display:flex;align-items:center;gap:6px;color:var(--tx3);letter-spacing:.06em}
+.c2chip b{color:var(--neon);font-weight:500;text-shadow:0 0 8px rgba(0,229,255,.55)}
+.cdot{width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb .right{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--tx2)}
+.appbar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.appbar h1{font:700 18px var(--disp);letter-spacing:.05em}
+.appbar .sub{display:block;font:500 8.5px var(--mono);letter-spacing:.18em;color:var(--neon);margin-top:1px}
+.iconbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--tx2);margin-left:auto}
+.iconbtn:active{background:var(--panel2);color:var(--neon)}
+main{flex:1;position:relative;min-height:0}
+.scr{position:absolute;inset:0;overflow-y:auto;display:none;padding:14px 14px 24px;-webkit-overflow-scrolling:touch}
+.scr.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+.c-head{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);font:600 9.5px var(--mono);letter-spacing:.18em;color:var(--tx2)}
+.c-head .r{margin-left:auto;font:500 9.5px var(--mono);letter-spacing:.08em;color:var(--tx3)}
+.hero{position:relative;border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px 16px 16px;margin-bottom:12px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.05) 1px,transparent 1px);background-size:26px 26px;pointer-events:none}
+.hero>*{position:relative}
+.eyebrow{font:600 9px var(--mono);letter-spacing:.2em;color:var(--neon)}
+.hero h2{font:700 22px/1.22 var(--disp);margin:10px 0 8px}
+.hero p{font-size:12.5px;color:var(--tx2)}
+.hero-act{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.stat-big{padding:14px 14px 10px}
+.stat-big .n{font:600 30px var(--mono);color:var(--neon);text-shadow:0 0 14px rgba(0,229,255,.55)}
+.stat-big canvas{display:block;width:100%;height:52px;margin-top:6px}
+.stat-row{display:flex;border-top:1px solid var(--line)}
+.stat-row>div{flex:1;padding:11px 8px 12px;text-align:center;border-right:1px solid var(--line)}
+.stat-row>div:last-child{border-right:none}
+.stat-row b{display:block;font:600 17px var(--mono)}
+.stat-row span{font:500 8px var(--mono);letter-spacing:.16em;color:var(--tx3)}
+.tg{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.tg:active{background:var(--panel2)}
+.tg.hit{animation:rowhit 1.4s}
+@keyframes rowhit{0%{background:rgba(0,229,255,.18)}100%{background:transparent}}
+.tg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 9px currentColor;background:var(--tx3);color:var(--tx3)}
+.tg-dot.ok{background:var(--ok);color:var(--ok)}.tg-dot.warn{background:var(--amber);color:var(--amber)}.tg-dot.bad{background:var(--red);color:var(--red)}
+.tg-bd{min-width:0;flex:1}
+.tg-code{font:600 13px var(--mono)}
+.tg-name{font-size:10.5px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg-num{font:500 11px var(--mono);color:var(--tx2);text-align:right;flex-shrink:0}
+.tg-plat{display:block;font:500 8.5px var(--mono);letter-spacing:.1em;color:var(--tx3)}
+.chev{color:var(--tx3)}
+.v-tick{display:flex;gap:9px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);font:500 9.5px var(--mono);color:var(--tx2);letter-spacing:.04em;overflow:hidden;white-space:nowrap}
+.v-tick b{color:var(--neon)}
+.v-tick .tdot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 1.6s infinite;flex-shrink:0}
+.pill{font:600 8.5px var(--mono);letter-spacing:.12em;padding:3px 9px;border-radius:99px;border:1px solid;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+.pill i{width:5px;height:5px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);border-color:rgba(46,229,157,.4);background:rgba(46,229,157,.07)}
+.pill.warn{color:var(--amber);border-color:rgba(255,179,92,.4);background:rgba(255,179,92,.07)}
+.pill.bad{color:var(--red);border-color:rgba(255,77,106,.4);background:rgba(255,77,106,.07)}
+.pill.idle{color:var(--tx3);border-color:var(--line2)}
+.pill.pls i{animation:pulse 1.6s infinite}
+.fi{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.fi:active{background:var(--panel2)}
+.f-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line2);color:var(--tx3);flex-shrink:0}
+.f-ic.MSG{color:var(--neon);border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.07)}
+.f-ic.MIC{color:var(--orange);border-color:rgba(255,159,67,.45);background:rgba(255,159,67,.07)}
+.f-ic.LOC{color:var(--ok);border-color:rgba(46,229,157,.45);background:rgba(46,229,157,.07)}
+.f-ic.CAM{color:var(--red);border-color:rgba(255,77,106,.45);background:rgba(255,77,106,.07)}
+.f-ic.FILE{color:var(--teal);border-color:rgba(57,211,230,.45);background:rgba(57,211,230,.07)}
+.f-meta{font:400 8.5px var(--mono);color:var(--tx3);letter-spacing:.06em}
+.f-text{font-size:12px;color:var(--tx);margin-top:2px;line-height:1.45}
+.empty{padding:26px 16px;text-align:center;color:var(--tx3);font-size:12px}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:11px 14px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font:600 10.5px var(--mono);letter-spacing:.08em;padding:7px 14px;border:1px solid var(--line2);border-radius:99px;color:var(--tx3)}
+.chip.on{color:var(--neon);border-color:var(--neon);background:rgba(0,229,255,.08);box-shadow:0 0 12px rgba(0,229,255,.2)}
+.log-row{display:grid;grid-template-columns:64px 40px 1fr;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);font:400 10.5px var(--mono);color:var(--tx2)}
+.log-row .lv{font-weight:600}
+.lv.INFO{color:var(--tx3)}.lv.OK{color:var(--ok)}.lv.WARN{color:var(--amber)}.lv.ERR{color:var(--red)}
+.log-row .msg{grid-column:1/-1;color:var(--tx);font-family:var(--sans);font-size:12px}
+.fab{position:absolute;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:18px;background:var(--neon);color:#021018;display:none;align-items:center;justify-content:center;z-index:40;box-shadow:0 6px 22px rgba(0,229,255,.45)}
+.fab.on{display:flex}.fab:active{transform:scale(.9)}
+.botnav{display:flex;background:var(--bg2);border-top:1px solid var(--line);padding:7px 4px calc(8px + env(safe-area-inset-bottom))}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px 0 2px;color:var(--tx3);font:600 8.5px var(--mono);letter-spacing:.08em;border-radius:14px}
+.nb .nic{width:48px;height:27px;border-radius:99px;display:flex;align-items:center;justify-content:center;transition:.2s;position:relative}
+.nb.on{color:var(--neon)}
+.nb.on .nic{background:rgba(0,229,255,.13);box-shadow:0 0 16px rgba(0,229,255,.22)}
+.nb .bdg{position:absolute;top:-3px;right:4px;min-width:15px;height:15px;border-radius:99px;background:rgba(0,229,255,.15);color:var(--neon);font:600 8.5px var(--mono);display:flex;align-items:center;justify-content:center;padding:0 4px;border:1px solid var(--line2)}
+.nb .bdg.live{color:var(--red);border-color:rgba(255,77,106,.5);background:rgba(255,77,106,.12);animation:pulse 1.6s infinite}
+
+/* ============ SHEET ============ */
+#sheet-root{position:fixed;inset:0;z-index:200;pointer-events:none}
+#sheet-root.open{pointer-events:auto}
+.sh-back{position:absolute;inset:0;background:rgba(1,4,9,.72);backdrop-filter:blur(4px);opacity:0;transition:.28s}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg2);border:1px solid var(--line2);border-bottom:none;border-radius:24px 24px 0 0;transform:translateY(105%);transition:transform .34s cubic-bezier(.32,.72,.24,1);max-height:89%;display:flex;flex-direction:column}
+@media(min-width:640px){.sheet{left:calc(50% - 212px);width:424px}}
+#sheet-root.open .sh-back{opacity:1}
+#sheet-root.open .sheet{transform:none}
+.sh-handle{width:40px;height:4px;border-radius:99px;background:var(--line2);margin:10px auto 2px;flex-shrink:0}
+.sh-head{display:flex;align-items:center;gap:10px;padding:10px 16px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
+.sh-head h3{font:700 15px var(--disp);letter-spacing:.04em}
+.sh-head .x{margin-left:auto;width:32px;height:32px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--tx3)}
+.sh-body{padding:14px 16px calc(20px + env(safe-area-inset-bottom));overflow-y:auto}
+.sh-body p{font-size:12.5px;color:var(--tx2);margin-bottom:12px}
+.m-act{display:flex;gap:10px;margin-top:16px}
+.m-act .btn{flex:1}
+.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-bottom:12px}
+.d-grid>div{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(0,190,255,.12);font-size:11px}
+.d-grid dt{color:var(--tx3)}
+.d-grid dd{font:500 10.5px var(--mono);text-align:right}
+.redact{background:#1A3450;color:transparent;border-radius:3px;padding:0 4px}
+.redact:hover{background:rgba(0,229,255,.12);color:var(--neon)}
+.harv{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.harv>div{flex:1;text-align:center;padding:11px 2px;border-right:1px solid var(--line)}
+.harv>div:last-child{border-right:none}
+.harv b{display:block;font:600 16px var(--mono)}
+.harv span{font:600 7.5px var(--mono);letter-spacing:.14em;color:var(--tx3)}
+.harv .fl b{animation:hf .9s}
+@keyframes hf{0%{color:var(--neon);text-shadow:0 0 12px var(--neon)}100%{}}
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.act-grid .btn{width:100%}
+.c-ok{color:var(--ok)!important}.c-warn{color:var(--amber)!important}
+.vec{width:100%;text-align:left;border:1px solid var(--line2);border-radius:14px;padding:13px 14px;margin-bottom:10px;background:var(--panel);display:block}
+.vec:active{border-color:var(--neon)}
+.v-top{display:flex;align-items:center;gap:9px}
+.v-name{font:600 14px var(--mono);letter-spacing:.06em}
+.v-tag{font:600 8px var(--mono);letter-spacing:.1em;padding:2px 7px;border-radius:5px;border:1px solid}
+.v-tag.zero{color:var(--red);border-color:rgba(255,77,106,.5)}
+.v-tag.one{color:var(--amber);border-color:rgba(255,179,92,.5)}
+.v-tag.imp{color:var(--teal);border-color:rgba(57,211,230,.5)}
+.v-plat{margin-left:auto;font:500 9.5px var(--mono);color:var(--tx3)}
+.v-desc{font-size:12px;color:var(--tx2);margin-top:6px}
+.v-ref{font:500 9.5px var(--mono);color:var(--teal);margin-top:4px}
+.ex-det{display:none;margin-top:10px;padding:10px 12px;background:var(--panel);border-left:2px solid var(--neon);border-radius:8px;font-size:12px;color:var(--tx2)}
+.vec.open .ex-det{display:block}
+.protect{list-style:none;margin-top:4px}
+.protect li{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(0,190,255,.12);font-size:12.5px;color:var(--tx2)}
+.protect li:last-child{border:none}
+.protect svg{color:var(--ok);margin-top:2px}
+.m-src{font:400 9.5px var(--mono);color:var(--tx3);margin-top:14px;line-height:1.8;border-top:1px solid var(--line);padding-top:12px}
+
+/* ============ RADAR ============ */
+.rad-wrap{position:relative;background:radial-gradient(circle at 50% 50%,#04101C 0%,#02060C 75%)}
+#radar{display:block;width:100%;aspect-ratio:1/1}
+.rad-ctl{position:absolute;top:10px;right:10px;display:flex;gap:6px}
+.rad-ctl .chip{padding:5px 11px;font-size:9.5px;background:rgba(3,8,15,.7)}
+#rad-alert{position:absolute;left:12px;top:12px;z-index:5;background:rgba(20,6,10,.9);border:1px solid rgba(255,77,106,.6);color:var(--red);border-radius:10px;padding:8px 12px;font:600 9.5px var(--mono);letter-spacing:.12em;display:flex;gap:8px;align-items:center;box-shadow:0 0 20px rgba(255,77,106,.25);animation:sl .35s;max-width:75%}
+#rad-alert i{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse 1s infinite}
+.rad-legend{display:flex;gap:14px;padding:10px 14px;border-top:1px solid var(--line);font:500 9px var(--mono);letter-spacing:.08em;color:var(--tx3);flex-wrap:wrap}
+.rad-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.rad-info{padding:12px 14px;border-top:1px solid var(--line);min-height:74px}
+.ri-row{display:flex;align-items:center;gap:10px}
+.ri-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 10px currentColor}
+.ri-name{font:600 13px var(--mono)}
+.ri-kind{font:600 8px var(--mono);letter-spacing:.12em;padding:2px 7px;border-radius:5px;border:1px solid}
+.ri-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ri-grid>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.ri-grid span{display:block;font:600 7.5px var(--mono);letter-spacing:.14em;color:var(--tx3)}
+.ri-grid b{font:500 12px var(--mono)}
+
+/* ============ PONSEL REALISTIS ============ */
+.phone-zone{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 10px 6px}
+.phone{width:212px;position:relative;border:3px solid rgba(0,229,255,.4);border-radius:28px;background:#01050B;padding:8px 7px;box-shadow:0 0 34px rgba(0,229,255,.14),0 20px 50px rgba(0,0,0,.6)}
+.p-power{position:absolute;right:-11px;top:76px;width:4px;height:46px;background:rgba(0,229,255,.45);border-radius:0 3px 3px 0;cursor:pointer}
+.p-screen{height:392px;border-radius:19px;background:#060D1A;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.p-flash{position:absolute;inset:0;background:rgba(255,77,106,.25);opacity:0;pointer-events:none;z-index:9}
+.p-flash.go{animation:pf 1s}
+@keyframes pf{0%{opacity:1}100%{opacity:0}}
+.p-status{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 0;font:600 9.5px var(--mono);flex-shrink:0;position:relative;z-index:6;color:var(--tx)}
+.p-right{display:flex;align-items:center;gap:5px;color:var(--tx2)}
+.p-dot{width:7px;height:7px;border-radius:50%;display:none}
+.p-dot.mic{background:var(--orange)}.p-dot.cam{background:#3BE58B}
+.p-dot.show{display:block;animation:pulse 1.8s infinite}
+.p-notif{position:absolute;left:8px;right:8px;top:26px;z-index:7}
+.pn{background:rgba(14,30,50,.96);border:1px solid rgba(0,229,255,.3);border-radius:13px;padding:8px 11px;animation:sl .35s;box-shadow:0 8px 24px rgba(0,0,0,.5);margin-bottom:6px}
+.pn-h{display:flex;align-items:center;gap:6px;font:600 8.5px var(--mono);letter-spacing:.08em;color:var(--neon)}
+.pn-h span{margin-left:auto;color:var(--tx3);font-weight:400}
+.pn-b{font-size:10.5px;color:var(--tx);margin-top:3px;line-height:1.4}
+@keyframes sl{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.p-wall{flex:1;position:relative;overflow:hidden;padding:8px 8px 0;background:radial-gradient(circle at 70% 12%,rgba(0,120,200,.28),transparent 55%),radial-gradient(circle at 20% 80%,rgba(0,229,255,.10),transparent 55%),linear-gradient(160deg,#0A1526,#050B14 70%)}
+.p-wall::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(120,190,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(120,190,255,.05) 1px,transparent 1px);background-size:30px 30px}
+.p-lock{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;padding:36px 14px 16px;cursor:pointer;background:radial-gradient(circle at 70% 20%,rgba(0,120,200,.3),transparent 60%),linear-gradient(160deg,#0A1526,#040910 75%)}
+.p-clock-big{font:500 38px var(--disp);text-align:center;position:relative}
+.p-date{font-size:10px;color:var(--tx2);text-align:center;margin-top:2px;position:relative}
+.p-unl{margin-top:10px;text-align:center;font:500 8.5px var(--mono);letter-spacing:.16em;color:rgba(223,242,252,.5);position:relative}
+.p-lock-ntf{margin-top:auto;display:flex;flex-direction:column;gap:6px;position:relative}
+.p-widget{display:flex;gap:8px;margin:10px 2px 8px;position:relative}
+.p-wx{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:8px 10px;backdrop-filter:blur(6px);display:flex;align-items:center;gap:8px}
+.p-wx b{font:600 15px var(--disp)}
+.p-wx small{display:block;font-size:8px;color:var(--tx2)}
+.p-wx svg{color:#FFD97A}
+.p-appgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px 2px;position:relative}
+.pa{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.pa:active .pa-ic{transform:scale(.86)}
+.pa-ic{width:38px;height:38px;border-radius:10.5px;display:flex;align-items:center;justify-content:center;position:relative;transition:.12s;color:#04121C;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.pa-n{font-size:6.8px;color:#E6F2FA;text-shadow:0 1px 2px rgba(0,0,0,.7);white-space:nowrap}
+.pa-bdg{position:absolute;top:-3px;right:-3px;min-width:14px;height:14px;border-radius:99px;background:var(--red);color:#fff;font:600 7.5px var(--mono);display:flex;align-items:center;justify-content:center;padding:0 3px;box-shadow:0 0 8px rgba(255,77,106,.8);animation:pulse 2s infinite}
+.p-dots{display:flex;gap:5px;justify-content:center;margin-top:9px;position:relative}
+.p-dot2{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;padding:0}
+.p-dot2.on{background:#fff}
+.p-dock{margin:7px 6px 5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:16px;display:flex;justify-content:space-around;padding:7px 4px;position:relative;backdrop-filter:blur(6px)}
+.p-hbar{width:86px;height:4px;border-radius:99px;background:rgba(255,255,255,.55);margin:3px auto 6px;flex-shrink:0;cursor:pointer;position:relative;z-index:8}
+.p-comp{position:absolute;left:8px;right:8px;bottom:56px;background:rgba(255,77,106,.16);border:1px solid rgba(255,77,106,.55);border-radius:9px;padding:4px 9px;font:600 7.5px var(--mono);letter-spacing:.12em;color:var(--red);text-align:center;z-index:4}
+.p-imcs{position:absolute;left:8px;right:8px;bottom:76px;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.45);border-radius:9px;padding:4px 9px;font:600 7.5px var(--mono);letter-spacing:.12em;color:var(--neon);text-align:center;z-index:4;cursor:pointer}
+.p-sensors{position:absolute;left:8px;right:8px;bottom:96px;background:rgba(2,6,12,.94);border:1px solid rgba(0,229,255,.3);border-radius:11px;padding:7px 11px;font-family:var(--mono);font-size:8.5px;z-index:5}
+.s-title{font:600 7px var(--mono);letter-spacing:.16em;color:var(--red);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.s-title::after{content:"";flex:1;height:1px;background:rgba(255,77,106,.25)}
+.s-row{display:flex;justify-content:space-between;color:var(--tx3);padding:1.5px 0;letter-spacing:.06em}
+.s-row.on{color:var(--tx2)}
+.s-row .st{color:var(--tx3)}
+.s-row.on .st{color:var(--orange)}
+.s-row.on .st.green{color:var(--ok)}
+.p-app{flex:1;display:flex;flex-direction:column;position:relative;z-index:2;background:#0A1018;min-height:0;animation:appin .22s}
+@keyframes appin{from{transform:scale(.94);opacity:.3}}
+.pa-head{display:flex;align-items:center;gap:8px;padding:8px 12px;font:600 11px var(--sans);flex-shrink:0;color:#04121C}
+.pa-back{display:flex;color:rgba(4,18,28,.8)}
+.pa-body{flex:1;overflow-y:auto;min-height:0}
+.p-strip{display:flex;align-items:center;gap:6px;background:rgba(255,77,106,.14);border-top:1px solid rgba(255,77,106,.4);padding:4px 10px;font:600 7px var(--mono);letter-spacing:.14em;color:var(--red);flex-shrink:0;animation:pulse 2.4s infinite}
+.pc-row{display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.pc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 10px var(--mono);flex-shrink:0;color:#04121C}
+.pc-nm{font-size:10.5px;color:var(--tx)}
+.pc-pv{font-size:8.5px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:112px}
+.pc-tm{margin-left:auto;font:500 8px var(--mono);color:var(--tx3);flex-shrink:0}
+.pc-call-ic{width:26px;height:26px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--tx3);flex-shrink:0}
+.pc-call-ic.missed{color:var(--red);border-color:rgba(255,77,106,.5);transform:rotate(135deg)}
+.bub-wrap{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.bub{max-width:82%;padding:7px 10px;border-radius:12px;font-size:10.5px;line-height:1.45}
+.bub.in{background:#16283C;align-self:flex-start;border-bottom-left-radius:4px}
+.bub.out{background:#12454F;align-self:flex-end;border-bottom-right-radius:4px}
+.bub-t{font:400 7px var(--mono);color:var(--tx3);margin-top:2px;text-align:right}
+.p-camlive{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.p-camlive .frame{width:120px;height:120px;border:1px solid rgba(59,229,139,.5);border-radius:10px;position:relative;overflow:hidden}
+.p-camlive .frame::after{content:"";position:absolute;left:0;right:0;height:2px;background:rgba(59,229,139,.7);box-shadow:0 0 10px #3BE58B;animation:cscan 2.2s linear infinite}
+@keyframes cscan{0%{top:0}50%{top:100%}100%{top:0}}
+.p-map{position:relative;flex:1;min-height:170px;background:linear-gradient(rgba(50,90,120,.25) 1.5px,transparent 1.5px) 0 0/100% 34px,linear-gradient(90deg,rgba(50,90,120,.25) 1.5px,transparent 1.5px) 0 0/38px 100%,radial-gradient(circle at 30% 30%,rgba(60,140,90,.18),transparent 45%),#0B1420}
+.p-pin{position:absolute;left:44%;top:46%;color:var(--red);filter:drop-shadow(0 0 8px rgba(255,77,106,.8));animation:pfloat 2s ease-in-out infinite}
+@keyframes pfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.p-maptag{position:absolute;left:10px;bottom:12px;right:10px;background:rgba(2,6,12,.85);border:1px solid var(--line2);border-radius:9px;padding:7px 10px;font:500 8.5px var(--mono);color:var(--tx2);line-height:1.6}
+.p-fotog{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px}
+.p-fotog>div{aspect-ratio:1;border-radius:3px}
+.p-setrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:10.5px;color:var(--tx)}
+.p-setrow small{display:block;font-size:8.5px;color:var(--tx3)}
+.p-setrow .pv{margin-left:auto;font:500 8.5px var(--mono);color:var(--tx3)}
+.p-setrow.alarm{color:var(--red)}.p-setrow.alarm .pv{color:var(--red)}
+.p-card{margin:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.phone-cap{font:400 9px var(--mono);color:var(--tx3);text-align:center;line-height:1.6;padding:0 12px}
+.phone-cap b{color:var(--orange);font-weight:500}
+.mini-feed{border-top:1px solid var(--line)}
+
+/* ============ LAYAR OPERASI ============ */
+#op-root{position:fixed;inset:0;z-index:260;display:none;background:var(--bg)}
+#op-root.open{display:block}
+.op{display:flex;flex-direction:column;height:100%;height:100dvh}
+.op-head{display:flex;align-items:center;gap:10px;padding:calc(9px + env(safe-area-inset-top)) 14px 9px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.op-head .bk{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--tx2)}
+.op-head .bk:disabled{opacity:.3}
+.op-tt b{display:block;font:700 14px var(--mono);letter-spacing:.06em}
+.op-tt span{font:500 8.5px var(--mono);letter-spacing:.14em;color:var(--neon)}
+#btn-fast{height:32px;padding:0 11px;border:1px solid var(--line2);border-radius:9px;color:var(--tx3);font:600 8.5px var(--mono);letter-spacing:.1em}
+#btn-fast.on{color:var(--neon);border-color:var(--neon)}
+.op-term{flex:1.15;min-height:0;display:flex;flex-direction:column;background:#02060C;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.op-term::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,229,255,.035) 0 1px,transparent 1px 3px)}
+.term-body{flex:1;overflow-y:auto;padding:10px 0;font:400 11px/1.85 var(--mono);position:relative;z-index:1}
+.tl{padding:0 14px;white-space:pre-wrap;word-break:break-word;color:var(--tx2)}
+.tl.ok{color:var(--ok)}.tl.warn{color:var(--amber)}
+.caret{display:inline-block;width:6px;height:11px;background:var(--neon);animation:blink 1s steps(1) infinite;vertical-align:-1px;margin-left:2px;box-shadow:0 0 8px var(--neon)}
+@keyframes blink{50%{opacity:0}}
+.op-phone{flex:1;min-height:0;overflow-y:auto;position:relative;background-image:radial-gradient(rgba(0,229,255,.07) 1px,transparent 1px);background-size:22px 22px}
+.op-done{position:absolute;left:0;right:0;bottom:0;padding:10px 14px calc(12px + env(safe-area-inset-bottom));z-index:8;background:rgba(3,7,16,.9);border-top:1px solid var(--line);display:flex;gap:10px}
+.op-done .btn{flex:1}
+
+/* ============ TOAST ============ */
+#toasts{position:fixed;left:14px;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--panel2);border:1px solid var(--line2);border-left:3px solid var(--neon);padding:11px 14px;border-radius:12px;font-size:12.5px;display:flex;gap:10px;align-items:flex-start;animation:sl .3s;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.toast.ok{border-left-color:var(--ok)}.toast.bad{border-left-color:var(--red)}
+.toast svg{margin-top:1px;color:var(--neon)}
+.toast.ok svg{color:var(--ok)}.toast.bad svg{color:var(--red)}
+@media(max-height:680px){.p-screen{height:330px}.p-clock-big{font-size:30px}}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-root">
+  <canvas id="lg-canvas"></canvas>
+  <div class="lg-card" id="lg-card">
+    <div class="lg-logo" id="lg-logo"></div>
+    <h1>PEGASUS</h1>
+    <div class="lg-sub">OPERATOR CONSOLE · MOBILE UNIT</div>
+    <div class="lg-line"></div>
+    <div class="field"><label>OPERATOR ID</label>
+      <div class="f-wrap"><input id="lg-user" placeholder="Admin" autocomplete="off"></div></div>
+    <div class="field"><label>PASSPHRASE</label>
+      <div class="f-wrap"><input id="lg-pass" type="password" placeholder="••••••••">
+        <button class="f-eye" id="lg-eye"></button></div></div>
+    <div class="lg-err" id="lg-err"></div>
+    <button class="btn pri rip" id="btn-login" style="width:100%">AUTENTIKASI</button>
+    <div class="lg-hint">DEMO LOKAL → user <b>Admin</b> · pass <b>admin123</b></div>
+  </div>
+  <div class="lg-boot" id="lg-boot" hidden><pre id="lg-bootlog"></pre></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="device" id="device">
+  <div class="sb">
+    <span id="sb-clock">--:--</span>
+    <span class="c2chip"><i class="cdot"></i>C2 ams3 · <b id="c2-ping">—</b></span>
+    <span class="right">
+      <svg width="13" height="11" viewBox="0 0 14 12" fill="currentColor"><rect x="0" y="7" width="2.4" height="4" rx="1"/><rect x="3.8" y="5" width="2.4" height="6" rx="1"/><rect x="7.6" y="3" width="2.4" height="8" rx="1"/><rect x="11.4" y="1" width="2.4" height="10" rx="1" opacity=".3"/></svg>
+      <svg width="14" height="11" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 7a15 15 0 0 1 20 0M6 11a9.5 9.5 0 0 1 12 0M10 15a4.5 4.5 0 0 1 4 0"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>
+      <svg width="20" height="11" viewBox="0 0 26 12"><rect x=".8" y=".8" width="21" height="10.4" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2.8" y="2.8" width="14" height="6.4" rx="1.4" fill="var(--neon)"/><rect x="23" y="3.6" width="2.4" height="4.8" rx="1.2" fill="currentColor"/></svg>
+    </span>
+  </div>
+  <header class="appbar">
+    <span id="ab-logo"></span>
+    <div><h1 id="ab-title">Dashboard</h1><span class="sub">SIMULASI EDUKATIF · DATA FIKTIF</span></div>
+    <button class="iconbtn rip" id="btn-about"></button>
+  </header>
+
+  <main id="main">
+    <section class="scr on" id="scr-home"></section>
+    <section class="scr" id="scr-vault">
+      <div class="card">
+        <div class="c-head"><span>TARGET VAULT</span>
+          <span class="pill ok pls"><i></i>LIVE</span>
+          <span class="r" id="v-count"></span></div>
+        <div class="v-tick" id="v-tick"><i class="tdot"></i><span>memantau perubahan vault…</span></div>
+        <div id="v-list"></div>
+      </div>
+      <p style="font:400 10px var(--mono);color:var(--tx3);text-align:center;padding:2px 10px 6px;line-height:1.7">Vault hidup: intake, deploy, dan beacon berubah otomatis.<br>Semua identitas adalah dummy lokal.</p>
+    </section>
+    <section class="scr" id="scr-radar">
+      <div class="card">
+        <div class="c-head"><span>PROXIMITY RADAR</span><span class="r" id="rad-status">SWEEP AKTIF</span></div>
+        <div class="rad-wrap">
+          <canvas id="radar" width="640" height="640"></canvas>
+          <div class="rad-ctl" id="rad-chips"></div>
+          <div id="rad-alert" hidden><i></i><span id="rad-alert-t"></span></div>
+        </div>
+        <div class="rad-legend">
+          <span><i style="background:var(--neon);box-shadow:0 0 6px var(--neon)"></i>TARGET VAULT</span>
+          <span><i style="background:var(--red);box-shadow:0 0 6px var(--red)"></i>TAK DIKENAL</span>
+          <span><i style="background:var(--amber)"></i>INFRASTRUKTUR</span>
+        </div>
+        <div class="rad-info" id="rad-info"></div>
+        <div style="padding:10px 14px 14px"><button class="btn pri rip" id="btn-scan" style="width:100%">PROXIMITY SCAN</button></div>
+      </div>
+    </section>
+    <section class="scr" id="scr-streams">
+      <div class="card">
+        <div class="c-head"><span>INTERCEPT STREAMS</span><span class="r" id="st-total"></span>
+          <button class="btn sm rip" id="btn-uplink" style="margin-left:auto"></button></div>
+        <div class="chips" id="st-chips"></div>
+        <div id="st-body"></div>
+      </div>
+    </section>
+    <section class="scr" id="scr-logs">
+      <div class="card">
+        <div class="c-head"><span>OPERATION LOG</span><span class="r" id="lg-count"></span></div>
+        <div id="lg-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <button class="fab rip" id="fab-add"></button>
+
+  <nav class="botnav" id="botnav">
+    <button class="nb on rip" data-scr="home"><span class="nic" data-i="dash"></span>HOME</button>
+    <button class="nb rip" data-scr="vault"><span class="nic" data-i="vault"><span class="bdg" id="nav-v">16</span></span>VAULT</button>
+    <button class="nb rip" data-scr="radar"><span class="nic" data-i="radio"></span>RADAR</button>
+    <button class="nb rip" data-scr="streams"><span class="nic" data-i="stream"><span class="bdg live" id="nav-s">0</span></span>STREAMS</button>
+    <button class="nb rip" data-scr="logs"><span class="nic" data-i="logs"></span>LOGS</button>
+  </nav>
+</div>
+
+<div id="sheet-root"></div>
+<div id="op-root"></div>
+<div id="toasts"></div>
+
+<script>
+/* ================= UTIL ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const fmtT=d=>d.toTimeString().slice(0,8);
+const ago=s=>fmtT(new Date(Date.now()-s*1000));
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const sleep=ms=>new Promise(r=>setTimeout(r,window.__fast?Math.min(ms,15):ms));
+
+/* ================= IKON ================= */
+const ICON={
+ dash:'<path d="M3.5 3.5h7v8h-7zM13.5 3.5h7v4.5h-7zM13.5 11h7v9.5h-7zM3.5 14.5h7v6h-7z"/>',
+ vault:'<circle cx="12" cy="12" r="7"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/><circle cx="12" cy="12" r="1.5"/>',
+ stream:'<path d="M3 12h2.5M8 8v8M12 4v16M16 8.5v7M20 10.5v3"/>',
+ logs:'<rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4.5"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ mic:'<rect x="9.2" y="3" width="5.6" height="11" rx="2.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/>',
+ cam:'<path d="M3 8.5h3.5L9 5.5h6l2.5 3H21v11H3z"/><circle cx="12" cy="13.5" r="3.4"/>',
+ pin:'<path d="M12 21.5s-6.5-5.6-6.5-10.4a6.5 6.5 0 1 1 13 0C18.5 15.9 12 21.5 12 21.5z"/><circle cx="12" cy="11" r="2.2"/>',
+ msg:'<path d="M21 11.6a8.6 8.6 0 0 1-8.6 8.6c-1.5 0-2.9-.4-4.1-1L3 20.6l1.5-5A8.6 8.6 0 1 1 21 11.6z"/>',
+ file:'<path d="M6.5 2.5h7.5l4 4v15h-11.5z"/><path d="M13.5 2.5V7H18M9.5 12.5h5M9.5 16h5"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11.5v5"/>',
+ trash:'<path d="M4 7h16M9.5 7V4h5v3M6.5 7l1 13.5h9l1-13.5"/>',
+ zap:'<path d="M13 2L4.5 13.5H11L9.5 22 19 10.5h-6.5z"/>',
+ radio:'<circle cx="12" cy="12" r="1.8"/><path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.3 18.7a9.5 9.5 0 0 1 0-13.4M18.7 5.3a9.5 9.5 0 0 1 0 13.4"/>',
+ check:'<path d="M4.5 12.5l4.5 4.5L19.5 7"/>',
+ report:'<rect x="5" y="2.5" width="14" height="19" rx="1.5"/><path d="M9 9h6M9 13h6M9 17h4"/>',
+ pause:'<path d="M9 5v14M15 5v14"/>',
+ play:'<path d="M7.5 4.5l12 7.5-12 7.5z"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ phone:'<path d="M6.8 3.5c.8 0 1.5.5 1.8 1.2l1.1 2.7c.3.7.1 1.5-.5 2l-1.2 1a13 13 0 0 0 5.6 5.6l1-1.2c.5-.6 1.3-.8 2-.5l2.7 1.1c.7.3 1.2 1 1.2 1.8v2.2c0 1.1-.9 2-2 1.9C9.9 20.7 3.3 14.1 2.7 5.5c-.1-1.1.8-2 1.9-2z"/>',
+ shield:'<path d="M12 3l7 2.6V11c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V5.6z"/>',
+ send:'<path d="M21 3L10.5 13.5M21 3l-6.8 18-3.7-7.5L3 9.8z"/>',
+ mail:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+ img:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4.5 17l4.5-4 3.5 3 3-2.5 4 3.5"/>',
+ clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+ cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ gear:'<path d="M4 7.5h9M17 7.5h3M4 16.5h5M13 16.5h7"/><circle cx="15" cy="7.5" r="2"/><circle cx="11" cy="16.5" r="2"/>',
+ globe:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><ellipse cx="12" cy="12" rx="4" ry="8.5"/>',
+ bank:'<path d="M3.5 9L12 4l8.5 5M5 9.5V18M9.5 9.5V18M14.5 9.5V18M19 9.5V18M3.5 20h17"/>',
+ eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+ logout:'<path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9"/>',
+ note:'<path d="M6 3.5h9l4 4v13H6z"/><path d="M9.5 11h5M9.5 14.5h5"/>',
+ music:'<path d="M9 18.5V6l11-2v12.5"/><circle cx="6.5" cy="18.5" r="2.5"/><circle cx="17.5" cy="16.5" r="2.5"/>',
+ video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+};
+const ic=(n,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
+
+/* ============ LOGO KUDA PEGASUS ============ */
+function logoSVG(s=64){
+ return `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none">
+  <path d="M5 29 C14 24 24 21 34 22 C28 26 24 31 22.5 38 C18 34 11.5 30.5 5 29 Z" fill="#00E5FF" opacity=".95"/>
+  <path d="M3.5 39.5 C13 34.5 23 32 33 33.5 C27 36.5 22 41.5 20 49 C15.5 45 9.5 41.5 3.5 39.5 Z" fill="#00E5FF" opacity=".6"/>
+  <path d="M2.5 50 C12 45.5 21 43.5 30 45 C25 48 21 52.5 19 59 C14 54.5 8 51.5 2.5 50 Z" fill="#00E5FF" opacity=".35"/>
+  <path d="M29 47 C28.5 38.5 31 30 37 24 C40 21 44 19.2 47 19 L49.2 11.5 L53 18 C58 19 61.2 23 62.3 28.2 C58.3 27 55 27 52 28.2 C54.2 30.4 55.3 33.4 55.2 36.6 C51.2 33.4 48 32.4 45 33.4 C41 34.8 39 37.8 38.1 41.4 C37.3 44.6 37.5 47.6 38.6 50.6 C35.4 48.8 32.2 47.6 29 47 Z" fill="#00E5FF"/>
+  <circle cx="47.8" cy="25.2" r="1.4" fill="#021018"/>
+ </svg>`;
+}
+ $('#lg-logo').innerHTML=logoSVG(96);
+ $('#ab-logo').innerHTML=logoSVG(30);
+ $('#btn-about').innerHTML=ic('info',18);
+ $('#fab-add').innerHTML=ic('plus',24);
+ $('#lg-eye').innerHTML=ic('eye',16);
+
+/* ================= KATALOG PERANGKAT & GENERATOR ================= */
+const platOf=os=>/macOS/.test(os)?'MAC':/^(iOS|iPadOS)/.test(os)?'iOS':/^Windows/.test(os)?'WIN':'AND';
+const PLATL={iOS:'iOS',AND:'ANDROID',MAC:'macOS',WIN:'WINDOWS'};
+const platLabel=os=>PLATL[platOf(os)];
+const DEVCAT=[
+ {dev:'iPhone 15 Pro',os:'iOS 17.4.1',fam:'iOS'},{dev:'iPhone 14',os:'iOS 17.3',fam:'iOS'},
+ {dev:'iPhone 13',os:'iOS 16.7',fam:'iOS'},{dev:'iPhone XR',os:'iOS 15.8',fam:'iOS'},
+ {dev:'iPad Air 5',os:'iPadOS 17.4',fam:'iOS'},{dev:'MacBook Air M2',os:'macOS 14.2',fam:'Desk'},
+ {dev:'MacBook Pro 14"',os:'macOS 14.4',fam:'Desk'},{dev:'ThinkPad X1',os:'Windows 11',fam:'Desk'},
+ {dev:'Lenovo IdeaPad',os:'Windows 11',fam:'Desk'},
+ {dev:'Galaxy S24 Ultra',os:'Android 14',fam:'And'},{dev:'Galaxy S23',os:'Android 14',fam:'And'},
+ {dev:'Galaxy A54',os:'Android 14',fam:'And'},{dev:'Galaxy Z Flip5',os:'Android 14',fam:'And'},
+ {dev:'Galaxy Tab S9',os:'Android 14',fam:'And'},{dev:'Redmi Note 13 Pro',os:'Android 14',fam:'And'},
+ {dev:'POCO X6',os:'Android 14',fam:'And'},{dev:'Xiaomi 13T',os:'Android 14',fam:'And'},
+ {dev:'OPPO Reno11',os:'Android 14',fam:'And'},{dev:'OPPO A78',os:'Android 13',fam:'And'},
+ {dev:'vivo V29',os:'Android 13',fam:'And'},{dev:'vivo Y36',os:'Android 13',fam:'And'},
+ {dev:'realme C55',os:'Android 13',fam:'And'},{dev:'realme GT Neo5',os:'Android 14',fam:'And'},
+ {dev:'itel S23',os:'Android 13',fam:'And'},{dev:'itel A70',os:'Android 13 Go',fam:'And'},
+ {dev:'itel P40',os:'Android 12 Go',fam:'And'},{dev:'Infinix Hot 30i',os:'Android 13',fam:'And'},
+ {dev:'Infinix Note 30',os:'Android 13',fam:'And'},{dev:'Tecno Camon 20',os:'Android 13',fam:'And'},
+ {dev:'Nokia G21',os:'Android 13',fam:'And'},{dev:'Pixel 8',os:'Android 14',fam:'And'},
+ {dev:'Pixel 7',os:'Android 14',fam:'And'},{dev:'ROG Phone 7',os:'Android 14',fam:'And'},
+ {dev:'Zenfone 10',os:'Android 14',fam:'And'},
+];
+const pickDev=fam=>rand(DEVCAT.filter(d=>!fam||d.fam===fam));
+const NAMES1=['Dimas','Raka','Intan','Bunga','Hendra','Salsa','Wahyu','Nurul','Bagas','Mega','Tomi','Rani','Andre','Sinta','Gilang','Vina','Iqbal','Dewi','Farel','Karin','Yoga','Putri','Bima','Sekar'];
+const NAMES2=['Pratama','Wijaya','Saputri','Hidayat','Anggraini','Firmansyah','Maharani','Setiawan','Puspita','Nugraha','Kusuma','Halim','Sanjaya','Lestari','Wibowo','Utami'];
+const CODES=['DELTA','OMEGA','RIMBA','ZONA','ARUS','BATU','ELANG','FENIX','GARUDA','JALAK','KILAT','MONAS','ORION','PANTAI','RAUNG','TANJU','VOLTA','XENON'];
+const ROLEPOOL=['Kontak warga','Jurnalis lepas','Aktivis mahasiswa','Pengemudi operasional','Sekretaris yayasan','Sumber anonim','Penjaga gudang','Kurir dokumen','Analis muda','Relawan medis','Admin media sosial','Kontrak proyek'];
+const VAULT_MAX=18;
+
+/* ================= DATA ================= */
+const state={
+  loggedIn:false,
+  targets:[
+    {id:'AGUSTI-7', name:'Arya Agustiawan', role:'Jurnalis investigasi', dev:'iPhone 14 Pro', os:'iOS 17.4.1', phone:'+62 812 4471 0938', status:'INFECTED', vector:'FINSIH · CVE-2021-30860', since:'28 Mei 03:12', d:{msgs:1284,rec:213,loc:3562,files:97}},
+    {id:'LENTARA-3', name:'Sari Lestari', role:'Aktivis lingkungan', dev:'Pixel 7', os:'Android 14', phone:'+62 813 8820 4415', status:'INFECTED', vector:'CHIMERA · social engineering', since:'02 Jun 21:47', d:{msgs:642,rec:88,loc:1541,files:31}},
+    {id:'HUKUM-9', name:'Bambang Wicaksana', role:'Pengacara bantuan hukum', dev:'iPhone 13', os:'iOS 16.7', phone:'+62 811 2254 7702', status:'PENDING', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'PUSPA-2', name:'Ratna Puspita', role:'Peneliti kebijakan', dev:'Galaxy S23', os:'Android 14', phone:'+62 878 6109 3384', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'KURIR-5', name:'Dedi Kurniawan', role:'Sumber internal', dev:'iPhone XR', os:'iOS 15.8', phone:'+62 856 3307 8291', status:'FAILED', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'BAYAN-1', name:'Maya Anggraini', role:'Redaktur media', dev:'iPhone 15 Pro', os:'iOS 17.4.1', phone:'+62 815 9942 1176', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'RIMBA-4', name:'Galih Pratama', role:'Fotografer lapangan', dev:'itel S23', os:'Android 13', phone:'+62 819 3345 7781', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'SIGMA-8', name:'Nadia Kirana', role:'Analis kebijakan', dev:'MacBook Air M2', os:'macOS 14.2', phone:'+62 817 5521 0934', status:'PENDING', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'DELTA-2', name:'Yusuf Maulana', role:'Koordinator lapangan', dev:'Redmi Note 13 Pro', os:'Android 14', phone:'+62 821 7789 4410', status:'INFECTED', vector:'CHIMERA · social engineering', since:'05 Jun 09:31', d:{msgs:318,rec:41,loc:892,files:17}},
+    {id:'ORBIT-6', name:'Tania Wulandari', role:'Peneliti akademik', dev:'Galaxy Tab S9', os:'Android 14', phone:'+62 812 9012 5567', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'SAHARA-1', name:'Rizky Ramadhan', role:'Driver operasional', dev:'itel A70', os:'Android 13 Go', phone:'+62 857 2210 8834', status:'FAILED', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'KANTOR-3', name:'Sekretariat Yayasan', role:'Perangkat kantor bersama', dev:'ThinkPad X1', os:'Windows 11', phone:'+62 21 5560 8812', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'PELABUH-2', name:'Andi Saputra', role:'Saksi kunci', dev:'vivo Y36', os:'Android 13', phone:'+62 813 6654 2290', status:'PENDING', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'MEDIS-4', name:'dr. Laila Rahmi', role:'Dokter sukarelawan', dev:'OPPO Reno11', os:'Android 14', phone:'+62 811 3327 9015', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'KAMPUS-7', name:'Fajar Nugroho', role:'Mahasiswa magang', dev:'Infinix Hot 30i', os:'Android 13', phone:'+62 819 8843 6620', status:'CLEAN', d:{msgs:0,rec:0,loc:0,files:0}},
+    {id:'WARTA-5', name:'Citra Ayu', role:'Reporter daerah', dev:'realme C55', os:'Android 13', phone:'+62 816 4478 3125', status:'INFECTED', vector:'KARAE · CVE-2019-3568', since:'01 Jun 17:20', d:{msgs:207,rec:29,loc:655,files:12}},
+  ],
+  sel:null, feed:[], logs:[], uplink:true, filter:'ALL',
+  events:412, series:Array.from({length:44},()=>ri(0,6)),
+  t0:Date.now(), busy:false, view:'home',
+  radRange:2000, radBlips:[], radSel:null,
+};
+let lastSnap=state.events, camTimers={};
+
+const MSGPOOL=['Rapat redaksi dipindah ke 15.00, ruang B.','Draft laporan sudah kirim, tolong direview hari ini.','Jangan kirim dokumennya lewat sini. Pakai kanal yang aman.','Pak, anggota komisi minta jadwal ulang kunjungan lapangan.','Bahan dari sumber internal — jangan disebar dulu.','Berangkat besok subuh, ambil kereta pertama.','Titik kumpul digeser ke gerbang timur, jam 9.','Kata kontaknya, berkas itu pernah diminta orang asing.','Ruang rapat diganti. Aku japri detailnya nanti malam.','Pastikan tidak ada HP di meja saat pembahasan bab sensitif.'];
+const CHATC=['Redaksi','Sumber-A','Koordinator','Ibu','Pengacara','Konsultan'];
+const LOCPLACES=[['Sudirman CBD',-6.2088,106.8456],['Kebayoran Baru',-6.2426,106.7996],['Monas perimeter',-6.1754,106.8272],['Tol Dalam Kota',-6.2015,106.8432],['Bekasi Selatan',-6.2617,106.9891],['Soekarno-Hatta T3',-6.1256,106.6558],['Jl. Gatot Subroto',-6.2231,106.8337],['Kampung kantor sumber',-6.1831,106.7912]];
+const MICPOOL=['Interior kendaraan','Ruang rapat tertutup','Ruang kerja, AC berdengung','Kafe, latar ramai','Kamar tidur, senyap','Lorong kantor'];
+const FILEPOOL=['SK-Rapat-Internal-041.pdf','Kontak-Sumber.vcf','Draft-Narasi-V2.docx','Rekaman-Dispersi.mp3','IMG_4471.HEIC','Catatan-Pertemuan.txt','Laporan-Q2_final.docm'];
+
+const EXPLOITS=[
+ {name:'FINSIH',plat:'iOS',tag:'ZERO-CLICK',ref:'CVE-2021-30860 · "FORCEDENTRY"',desc:'Rantai eksploitasi lewat iMessage tanpa sentuhan korban: lampiran berpura-pura menjadi GIF memicu kerusakan memori pada ImageIO, membuka akses kernel, lalu memasang implant.',detail:'Didokumentasikan Citizen Lab & Amnesty Tech (2021). Ditambal Apple di iOS 14.7/14.8.'},
+ {name:'KARAE',plat:'iOS / Android',tag:'ZERO-CLICK',ref:'CVE-2019-3568 · WhatsApp VOIP',desc:'Panggilan suara WhatsApp yang tak terjawab memicu buffer overflow pada stack VOIP — implant terpasang tanpa interaksi apa pun.',detail:'Ditambal WhatsApp pada Mei 2019. Korban kerap hanya melihat "panggilan tak terjawab".'},
+ {name:'CHIMERA',plat:'Android',tag:'ONE-CLICK',ref:'Rekayasa sosial',desc:'Tautan pemancing dikirim via SMS; satu ketukan korban memuat halaman eksploit peramban yang menjatuhkan dropper.',detail:'Edukasi phishing tetap relevan, tapi vektor zero-click mengabaikan lapisan pertahanan ini sepenuhnya.'},
+ {name:'SPECTRA',plat:'macOS / Windows',tag:'ONE-CLICK',ref:'Rekayasa sosial · lampiran',desc:'Lampiran dokumen bermakro via email; satu ketukan korban memasang implant desktop dan membuka mikrofon serta berkas.',detail:'Desktop bukan zona aman: implant berbasis dokumen tetap memanen berkas dan mikrofon walau tanpa kamera.'},
+ {name:'ALIEN',plat:'Android',tag:'IMPLANT',ref:'—',desc:'Runtime implant pasca-eksploitasi: memanen pesan, mikrofon, lokasi, foto, kontak, dan merekam ketikan.',detail:'ALIEN bekerja di dalam proses aplikasi sah sehingga sulit dideteksi antivirus.'},
+ {name:'IMCS',plat:'iOS / Android',tag:'IMPLANT',ref:'—',desc:'Modul pengumpul inti: menyadap pesan, mikrofon lingkungan, koordinat GPS, dan sinkronisasi berkas ke server operator.',detail:'Satu ponsel terinfeksi dapat mengirim ribuan rekaman per hari.'},
+];
+const VECS={
+ FINSIH:{plat:'iOS',tag:'ZERO-CLICK',ref:'CVE-2021-30860 · FORCEDENTRY',succ:'Tinggi',
+  desc:'Lampiran iMessage palsu memicu kerusakan memori di ImageIO — tanpa satu pun sentuhan korban.',
+  script:t=>[
+   {txt:'[>] PSCMD-01 · secure channel established · relay ams3 · AES-256-GCM',d:420},
+   {txt:`[*] crafting payload :: vector=FINSIH · target=${t.id} · plat=iOS`,d:400},
+   {txt:'[>] iMessage: delivering malformed .gif watcher → perangkat target',d:650},
+   {txt:'[...] awaiting delivery receipt …',d:900},
+   {txt:'[...] DELIVERED — zero user interaction required',d:320},
+   {txt:'[*] ImageIO: parsing crafted attachment — heap groom OK',d:480},
+   {txt:'[!] CVE-2021-30860 "FORCEDENTRY" — kernel primitive acquired',d:440},
+   {txt:'[+] kernel r/w · PAC/PPL bypass OK',d:380},
+   {txt:'[+] dropping implant → /usr/lib/libimcs.dylib (12.4 MB)',d:460},
+   {txt:'[+] persistence: springboard watchdog · respring-safe',d:360},
+   {txt:'[*] C2 handshake → cdn-static-assets[.]net:443 … 200 OK (84 ms)',d:560},
+   {txt:'[+] beacon registered · streams armed: MSG / MIC / LOC / FILE / CAM',d:340},
+   {txt:`[#] VAULT UPDATE :: ${t.id} status → INFECTED`,d:260},
+  ]},
+ KARAE:{plat:'iOS / Android',tag:'ZERO-CLICK',ref:'CVE-2019-3568 · WhatsApp VOIP',succ:'Sedang',
+  desc:'Panggilan WhatsApp yang tak terjawab memicu buffer overflow — implant terpasang tanpa interaksi.',
+  notif:{from:'WHATSAPP',text:'Panggilan suara tidak terjawab (1) · baru saja'},
+  script:t=>[
+   {txt:'[>] PSCMD-01 · secure channel established · relay ams3 · AES-256-GCM',d:420},
+   {txt:`[*] crafting payload :: vector=KARAE · target=${t.id}`,d:400},
+   {txt:'[>] WhatsApp VOIP: placing missed call from burner number …',d:800},
+   {txt:'[*] SRTP heap spray via CVE-2019-3568 — buffer overflow OK',d:520},
+   {txt:'[+] RCE achieved — no user interaction',d:340},
+   {txt:/^iOS|^iPadOS/.test(t.os)?'[+] dropping implant → /usr/lib/libimcs.dylib':'[+] dropping dropper → ALIEN runtime v7',d:440},
+   {txt:'[+] persistence registered · safe-mode resistant',d:340},
+   {txt:'[*] C2 handshake → cdn-metrics[.]net:443 … 200 OK (96 ms)',d:520},
+   {txt:'[+] beacon registered · streams armed',d:320},
+   {txt:`[#] VAULT UPDATE :: ${t.id} status → INFECTED`,d:260},
+  ]},
+ CHIMERA:{plat:'Android',tag:'ONE-CLICK',ref:'Rekayasa sosial',succ:'Sedang',
+  desc:'Tautan pemancing via SMS; satu ketukan korban memuat halaman eksploit peramban.',
+  notif:{from:'SMS · +62 813••••••',text:'Pak, surat panggilan sidang sudah kami kirim: secure-upload[.]top/d'},
+  script:t=>[
+   {txt:'[>] PSCMD-01 · secure channel established · relay sin3 · AES-256-GCM',d:420},
+   {txt:`[*] crafting lure page :: vector=CHIMERA · target=${t.id}`,d:400},
+   {txt:'[>] SMS gateway: sending lure → perangkat target (secure-upload[.]top/d?x=)',d:650},
+   {txt:'[...] awaiting victim interaction (one-click) …',d:1800},
+   {txt:'[+] link opened — WebView exploit chain fired',d:420},
+   {txt:'[+] Zygote injection OK · SELinux context: platform_app',d:420},
+   {txt:'[+] dropping dropper → implant ALIEN v7',d:420},
+   {txt:'[+] accessibility service registered · keylog armed',d:360},
+   {txt:'[*] C2 handshake → cdn-metrics[.]net:443 … 200 OK (112 ms)',d:520},
+   {txt:'[+] beacon registered · streams armed: MSG / MIC / LOC / FILE',d:320},
+   {txt:`[#] VAULT UPDATE :: ${t.id} status → INFECTED`,d:260},
+  ]},
+ SPECTRA:{plat:'macOS / Windows',tag:'ONE-CLICK',ref:'Rekayasa sosial · lampiran',succ:'Sedang',
+  desc:'Lampiran dokumen bermakro via email; satu ketukan korban memasang implant desktop.',
+  notif:{from:'MAIL · kantor',text:'Mohon review lampiran laporan: Laporan-Q2_final.docm'},
+  script:t=>[
+   {txt:'[>] PSCMD-01 · secure channel established · relay ams3 · AES-256-GCM',d:420},
+   {txt:`[*] crafting payload :: vector=SPECTRA · target=${t.id} · plat=${platOf(t.os)}`,d:400},
+   {txt:'[>] SMTP: mengirim lampiran docm → perangkat target',d:650},
+   {txt:'[...] awaiting victim interaction (one-click) …',d:1800},
+   {txt:'[+] lampiran dibuka — makro dieksekusi',d:420},
+   {txt:platOf(t.os)==='MAC'?'[+] dropping implant → ~/Library/.helperd (12.1 MB)':'[+] dropping implant → %AppData%\\svchost.exe (12.1 MB)',d:460},
+   {txt:platOf(t.os)==='MAC'?'[+] persistence: LaunchAgent registered':'[+] persistence: Run key registered',d:360},
+   {txt:'[*] C2 handshake → cdn-telemetry[.]net:443 … 200 OK (104 ms)',d:520},
+   {txt:'[+] beacon registered · streams armed: FILE / KB / MIC',d:320},
+   {txt:`[#] VAULT UPDATE :: ${t.id} status → INFECTED`,d:260},
+  ]},
+};
+function vectorsFor(os){const p=platOf(os);
+ if(p==='iOS')return ['FINSIH','KARAE'];
+ if(p==='AND')return ['KARAE','CHIMERA'];
+ return ['SPECTRA'];}
+
+/* ================= FEED / LOG / TOAST ================= */
+function log(level,src,msg){
+  state.logs.unshift({t:ago(0),level,src,msg});
+  if(state.logs.length>300)state.logs.pop();
+  renderLogs();
+}
+function toast(msg,kind=''){
+  const el=document.createElement('div');
+  el.className='toast '+kind;
+  el.innerHTML=ic(kind==='ok'?'check':'info',16)+`<span>${msg}</span>`;
+  $('#toasts').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='.3s';setTimeout(()=>el.remove(),320)},4000);
+}
+const total=d=>d.msgs+d.rec+d.loc+d.files;
+function randomText(type){
+  if(type==='MSG')return rand(MSGPOOL);
+  if(type==='LOC'){const[p,la,ln]=rand(LOCPLACES);
+    return `${(la+(Math.random()-.5)*.004).toFixed(4)}, ${(ln+(Math.random()-.5)*.004).toFixed(4)} — ${p} · ${ri(3,38)} km/h · akurasi ${ri(5,22)} m`;}
+  if(type==='MIC')return `Voice capture ${String(ri(8,95)).padStart(2,'0')}:${String(ri(0,59)).padStart(2,'0')} — ${rand(MICPOOL)} · ${ri(1,3)} pembicara`;
+  if(type==='CAM')return rand(['Front camera frame 1280×960 — wajah terdeteksi: 1','Rear camera burst ×3 — scene: dokumen di atas meja','Front camera frame — kondisi: gelap, layar menyala']);
+  return `FILE_SYNC ${rand(FILEPOOL)} — ${(Math.random()*4+.4).toFixed(1)} MB · sha256 tersensor`;
+}
+function addFeed(tid,type,text){
+  const t=state.targets.find(x=>x.id===tid); if(!t)return;
+  state.feed.unshift({id:uid(),t:ago(0),tid,type,text});
+  if(state.feed.length>240)state.feed.pop();
+  if(type==='MSG')t.d.msgs++;
+  if(type==='MIC'){t.d.rec++;t.camUntil=0;clearTimeout(camTimers[tid]);}
+  if(type==='LOC'){t.d.loc++;t.lastLoc=text;}
+  if(type==='CAM'){t.d.files++;t.camUntil=Date.now()+7000;clearTimeout(camTimers[tid]);camTimers[tid]=setTimeout(paintPhones,7200);}
+  if(type==='FILE')t.d.files++;
+  t.flashType=type;t.flashAt=Date.now();
+  state.events+=ri(2,8);
+  renderTargets(); renderHomeLive(); renderStreams(); paintPhones();
+}
+function simTick(){
+  const inf=state.targets.filter(t=>t.status==='INFECTED');
+  if(!state.uplink||!inf.length)return;
+  const n=ri(1,2), w=()=>{const r=Math.random();return r<.42?'MSG':r<.62?'LOC':r<.78?'MIC':r<.9?'FILE':'CAM'};
+  for(let i=0;i<n;i++){const t=rand(inf),ty=w();addFeed(t.id,ty,randomText(ty));}
+}
+
+/* ================= NAVIGASI ================= */
+const TITLES={home:'Dashboard',vault:'Target Vault',radar:'Radar Proximitas',streams:'Intercept Streams',logs:'Operation Log'};
+function switchScr(v){
+  state.view=v;
+  $$('.scr').forEach(x=>x.classList.remove('on'));
+  $('#scr-'+v).classList.add('on');
+  $$('.nb').forEach(b=>b.classList.toggle('on',b.dataset.scr===v));
+  $('#ab-title').textContent=TITLES[v];
+  $('#fab-add').classList.toggle('on',v==='vault');
+  if(v==='home')renderHomeLive();
+  if(v==='vault')renderTargets();
+  if(v==='radar'){radarStart();renderRadInfo();}else radarStop();
+  if(v==='streams')renderStreams();
+  if(v==='logs')renderLogs();
+}
+ $('#botnav').addEventListener('click',e=>{const b=e.target.closest('.nb'); if(b)switchScr(b.dataset.scr);});
+ $('#fab-add').onclick=sheetAdd;
+ $$('.nb .nic').forEach(el=>{el.insertAdjacentHTML('afterbegin',ic(el.dataset.i,17))});
+
+/* ================= HOME ================= */
+function renderHome(){
+  $('#scr-home').innerHTML=`
+  <div class="hero">
+    <span class="eyebrow">ADVISORY · RINGKASAN PELAPORAN PUBLIK</span>
+    <h2>Zero-click: mengintai tanpa satu pun ketukan.</h2>
+    <p>Spyware komersial dapat menguasai ponsel lewat celah aplikasi pesan — tanpa tautan diklik. Implant lalu menyala menjadi mikrofon, kamera, dan pelacak lokasi.</p>
+    <div class="hero-act">
+      <button class="btn pri rip" id="h-to-vault">${ic('zap',15)} Masuk ke Vault</button>
+      <button class="btn gh rip" id="h-arsenal">${ic('file',15)} Arsenal</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="stat-big">
+      <div style="font:600 8.5px var(--mono);letter-spacing:.18em;color:var(--tx3)">EVENTS HARI INI · 2 JAM TERAKHIR</div>
+      <div class="n" id="h-events">0</div>
+      <canvas id="spark" width="760" height="104"></canvas>
+    </div>
+    <div class="stat-row">
+      <div><b id="h-targets">0</b><span>TARGET</span></div>
+      <div><b id="h-infect" style="color:var(--neon);text-shadow:0 0 10px rgba(0,229,255,.5)">0</b><span>IMPLANT</span></div>
+      <div><b id="h-up">00:00</b><span>UPTIME</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="c-head"><span>LIVE INTERCEPTS</span>
+      <button class="btn sm gh rip" id="h-to-streams" style="margin-left:auto">Semua</button></div>
+    <div id="h-feed"></div>
+  </div>`;
+  $('#h-to-vault').onclick=()=>switchScr('vault');
+  $('#h-to-streams').onclick=()=>switchScr('streams');
+  $('#h-arsenal').onclick=sheetArsenal;
+  renderHomeLive(); drawSpark();
+}
+function renderHomeLive(){
+  if(!$('#scr-home').classList.contains('on'))return;
+  $('#h-events').textContent=state.events.toLocaleString('id-ID');
+  $('#h-targets').textContent=state.targets.length;
+  $('#h-infect').textContent=state.targets.filter(t=>t.status==='INFECTED').length;
+  const s=(Date.now()-state.t0)/1000;
+  $('#h-up').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+  $('#h-feed').innerHTML=state.feed.slice(0,5).map(feedItemHTML).join('')||'<div class="empty">Belum ada intersep.</div>';
+}
+function drawSpark(){
+  const c=$('#spark'); if(!c)return;
+  const ctx=c.getContext('2d'),W=c.width,H=c.height,max=Math.max(...state.series,8);
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,229,255,.14)';ctx.lineWidth=1;
+  for(let y=H/4;y<H;y+=H/4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.strokeStyle='#00E5FF';ctx.lineWidth=3;ctx.shadowColor='rgba(0,229,255,.8)';ctx.shadowBlur=8;
+  ctx.beginPath();
+  state.series.forEach((v,i)=>{
+    const x=i/(state.series.length-1)*W, y=H-10-(v/max)*(H-24);
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+  });
+  ctx.stroke(); ctx.shadowBlur=0;
+  const lv=state.series[state.series.length-1];
+  ctx.fillStyle='#00E5FF';ctx.beginPath();ctx.arc(W-4,H-10-(lv/max)*(H-24),5,0,7);ctx.fill();
+}
+
+/* ================= DAFTAR / STREAMS / LOGS ================= */
+function pillHTML(st){
+  const m={INFECTED:'ok',PENDING:'warn',FAILED:'bad',CLEAN:'idle',LOST:'warn'};
+  return `<span class="pill ${m[st]} ${st==='INFECTED'?'pls':''}"><i></i>${st}</span>`;
+}
+function renderTargets(){
+  $('#v-list').innerHTML=state.targets.map(t=>`
+    <div class="tg rip" data-id="${t.id}">
+      <i class="tg-dot ${{INFECTED:'ok',PENDING:'warn',FAILED:'bad',LOST:'warn'}[t.status]||''}"></i>
+      <div class="tg-bd"><span class="tg-code">${t.id}</span><span class="tg-name">${t.name} — ${t.role}</span></div>
+      <div class="tg-num"><span class="tg-plat">${platLabel(t.os)} · ${t.dev.split(' ')[0]}</span>${total(t.d).toLocaleString('id-ID')}</div>
+      <span class="chev">${ic('back',14).replace('M15 5l-7 7 7 7','M9 5l7 7-7 7')}</span>
+    </div>`).join('');
+  $('#v-count').textContent=state.targets.length+' target';
+  $('#nav-v').textContent=state.targets.length;
+}
+function pulseRow(id){const r=document.querySelector(`.tg[data-id="${id}"]`);if(!r)return;r.classList.remove('hit');void r.offsetWidth;r.classList.add('hit');}
+function vTick(html){const el=$('#v-tick');if(el)el.innerHTML=`<i class="tdot"></i><span><b>${fmtT(new Date()).slice(0,5)}</b> ${html}</span>`;}
+function feedItemHTML(e){
+  return `<div class="fi" data-tid="${e.tid}">
+    <span class="f-ic ${e.type}">${ic({MSG:'msg',MIC:'mic',LOC:'pin',CAM:'cam',FILE:'file'}[e.type],14)}</span>
+    <div style="min-width:0;flex:1"><div class="f-meta">${e.tid} · ${e.t} · INTERCEPT</div><div class="f-text">${e.text}</div></div>
+  </div>`;
+}
+function renderStreams(){
+  const rows=state.feed.filter(e=>state.filter==='ALL'||e.type===state.filter);
+  $('#st-body').innerHTML=rows.length?rows.map(feedItemHTML).join('')
+    :'<div class="empty">Belum ada intersep.<br>Jalankan Deploy Exploit pada target di Vault.</div>';
+  $('#st-total').textContent=rows.length+' events';
+  $('#btn-uplink').innerHTML=ic(state.uplink?'pause':'play',13)+(state.uplink?'Cut Uplink':'Resume');
+  $('#nav-s').textContent=state.feed.length;
+}
+function renderLogs(){
+  $('#lg-body').innerHTML=state.logs.map(l=>
+    `<div class="log-row"><span>${l.t}</span><span class="lv ${l.level}">${l.level}</span><span style="color:var(--teal)">${l.src}</span><span class="msg">${l.msg}</span></div>`).join('')
+    ||'<div class="empty">Log kosong.</div>';
+  $('#lg-count').textContent=state.logs.length+' entri';
+}
+
+/* ================= VAULT HIDUP (EVENT ACAK) ================= */
+function newCode(){let c;do{c=rand(CODES)+'-'+ri(1,9)}while(state.targets.some(t=>t.id===c));return c;}
+function vaultEvent(){
+  if(!state.loggedIn)return;
+  const r=Math.random();
+  const inf=state.targets.filter(t=>t.status==='INFECTED');
+  const pend=state.targets.filter(t=>t.status==='PENDING');
+  const fail=state.targets.filter(t=>t.status==='FAILED');
+  if(r<.24&&state.targets.length<VAULT_MAX){
+    const code=newCode(),dv=pickDev();
+    state.targets.push({id:code,name:rand(NAMES1)+' '+rand(NAMES2),role:rand(ROLEPOOL),dev:dv.dev,os:dv.os,
+      phone:'+62 8'+ri(10,99)+' '+ri(1000,9999)+' '+ri(1000,9999),
+      status:Math.random()<.3?'PENDING':'CLEAN',d:{msgs:0,rec:0,loc:0,files:0}});
+    log('INFO','INTAKE',`target baru ${code} · ${dv.dev} — menunggu triase`);
+    toast(`Intake: ${code} (${dv.dev}) masuk vault.`,'ok');
+    vTick(`INTAKE → <b>${code}</b> · ${dv.dev}`);
+    renderTargets();renderHomeLive();pulseRow(code);radarSeed();
+  } else if(r<.44&&pend.length){
+    const t=rand(pend), vs=vectorsFor(t.os), vn=rand(vs), vec=VECS[vn];
+    if(Math.random()<.7){
+      t.status='INFECTED';t.vector=`${vn} · ${vec.ref.split(' · ')[0]}`;
+      t.since=fmtT(new Date()).slice(0,5);
+      t.d={msgs:0,rec:0,loc:0,files:0};
+      log('OK','PSCMD',`auto-deploy ${vn} → ${t.id} BERHASIL`);
+      toast(`${t.id} — implant aktif via ${vn}.`,'ok');
+      vTick(`DEPLOY OK → <b>${t.id}</b> · ${vn}`);
+      setTimeout(()=>addFeed(t.id,'LOC','beacon pertama — '+randomText('LOC')),900);
+    }else{
+      t.status='FAILED';
+      log('WARN','PSCMD',`auto-deploy ${vn} → ${t.id} GAGAL — perangkat offline`);
+      vTick(`DEPLOY GAGAL → <b>${t.id}</b>`);
+    }
+    renderTargets();renderHomeLive();pulseRow(t.id);radarSeed();
+  } else if(r<.56&&fail.length){
+    const t=rand(fail);
+    if(Math.random()<.45){t.status='PENDING';log('INFO','VAULT',`${t.id} masuk antrean ulang (retry)`);vTick(`RETRY → <b>${t.id}</b> masuk antrean`);}
+    else{log('INFO','VAULT',`${t.id} masih tidak dapat dijangkau`);vTick(`RETRY → <b>${t.id}</b> masih offline`);}
+    renderTargets();pulseRow(t.id);
+  } else if(r<.72&&inf.length){
+    const t=rand(inf);
+    t.status='LOST';
+    log('WARN','IMCS',`beacon ${t.id} hilang — perangkat offline`);
+    vTick(`BEACON LOST → <b>${t.id}</b>`);
+    toast(`${t.id} — beacon hilang, menunggu pemulihan.`,'bad');
+    renderTargets();renderHomeLive();pulseRow(t.id);
+    setTimeout(()=>{
+      if(t.status==='LOST'){t.status='INFECTED';log('OK','IMCS',`beacon ${t.id} pulih`);vTick(`BEACON PULIH → <b>${t.id}</b>`);renderTargets();renderHomeLive();pulseRow(t.id);}
+    },14000+Math.random()*14000);
+  } else if(r<.88){
+    const pool=state.targets.filter(t=>['CLEAN','INFECTED','FAILED'].includes(t.status));
+    if(!pool.length)return;
+    const t=rand(pool);
+    const fam=platOf(t.os)==='AND'?'And':platOf(t.os)==='iOS'?'iOS':'Desk';
+    const nd=pickDev(fam);
+    if(nd.dev!==t.dev){
+      const wasInf=t.status==='INFECTED';
+      t.dev=nd.dev;t.os=nd.os;
+      if(wasInf){t.status='FAILED';t.vector='—';log('WARN','SIGINT',`perangkat ${t.id} berganti → ${nd.dev} — implant tidak terbawa`);vTick(`DEVICE CHANGE → <b>${t.id}</b> · ${nd.dev} · implant hilang`);toast(`${t.id} ganti perangkat — implant hilang.`,'bad');renderHomeLive();}
+      else{log('INFO','SIGINT',`perangkat ${t.id} berganti → ${nd.dev} (${nd.os})`);vTick(`DEVICE CHANGE → <b>${t.id}</b> · ${nd.dev}`);}
+      renderTargets();pulseRow(t.id);
+    }
+  } else {
+    const t=rand(state.targets);
+    log('INFO','IMCS',`beacon check ${t.id} · ${ri(62,148)} ms`);
+    vTick(`HEARTBEAT → <b>${t.id}</b> · OK`);
+  }
+}
+setInterval(vaultEvent,9000);
+
+/* ================= PONSEL: DATA APLIKASI ================= */
+const P1=[
+ {id:'wa',n:'WhatsApp',bg:'linear-gradient(160deg,#25D366,#128C4B)',cat:'chat',g:'msg',st:'MSG'},
+ {id:'sig',n:'Signal',bg:'linear-gradient(160deg,#3A76F0,#1B4CA8)',cat:'chat',g:'shield',st:'MSG'},
+ {id:'tg',n:'Telegram',bg:'linear-gradient(160deg,#54C7EC,#1E7FA8)',cat:'chat',g:'send',st:'MSG'},
+ {id:'mail',n:'Mail',bg:'linear-gradient(160deg,#5C9BFF,#2557C9)',cat:'chat',g:'mail',st:'MSG'},
+ {id:'map',n:'Maps',bg:'linear-gradient(160deg,#5CE0A0,#1F8F5A)',cat:'map',g:'pin',st:'LOC'},
+ {id:'cam',n:'Kamera',bg:'linear-gradient(160deg,#4A5563,#232B36)',cat:'cam',g:'cam',st:'CAM'},
+ {id:'foto',n:'Foto',bg:'linear-gradient(160deg,#FFD97A,#FF9F43)',cat:'foto',g:'img',st:'FILE'},
+ {id:'jam',n:'Jam',bg:'linear-gradient(160deg,#2A323E,#14181F)',cat:'jam',g:'clock',st:null},
+];
+const P2=[
+ {id:'cal',n:'Kalender',bg:'linear-gradient(160deg,#E86A6A,#B03A3A)',cat:'cal',g:'cal',st:null},
+ {id:'set',n:'Setelan',bg:'linear-gradient(160deg,#8C99A8,#4A5766)',cat:'set',g:'gear',st:null},
+ {id:'chrome',n:'Chrome',bg:'linear-gradient(160deg,#7FD1FF,#2E86C9)',cat:'web',g:'globe',st:null},
+ {id:'bank',n:'NeoBank',bg:'linear-gradient(160deg,#F5C86A,#B8862E)',cat:'bank',g:'bank',st:'MSG'},
+ {id:'music',n:'Music',bg:'linear-gradient(160deg,#FF8FB0,#C9446E)',cat:'music',g:'music',st:'MIC'},
+ {id:'tube',n:'VideoTube',bg:'linear-gradient(160deg,#FF7A7A,#C22B2B)',cat:'tube',g:'video',st:null},
+ {id:'glim',n:'Glimpse',bg:'linear-gradient(160deg,#C69BFF,#7A3FC9)',cat:'glim',g:'img',st:'LOC'},
+ {id:'note',n:'Catatan',bg:'linear-gradient(160deg,#FFE08A,#D9A93A)',cat:'note',g:'note',st:'FILE'},
+];
+const DOCK=[
+ {id:'tel',n:'Telepon',bg:'linear-gradient(160deg,#54E08A,#128C4B)',cat:'call',g:'phone',st:'MSG'},
+ {id:'sms',n:'Pesan',bg:'linear-gradient(160deg,#6FD3FF,#1E7FA8)',cat:'chat',g:'msg',st:'MSG'},
+ {id:'chrome',n:'Chrome',bg:'linear-gradient(160deg,#7FD1FF,#2E86C9)',cat:'web',g:'globe',st:null},
+ {id:'cam',n:'Kamera',bg:'linear-gradient(160deg,#4A5563,#232B36)',cat:'cam',g:'cam',st:'CAM'},
+];
+const appById=id=>P1.concat(P2,DOCK).find(a=>a.id===id);
+
+function pStatusHTML(){
+  return `<div class="p-status"><span class="p-clock">--:--</span>
+    <span class="p-right">
+      <svg width="12" height="10" viewBox="0 0 14 12" fill="currentColor"><rect x="0" y="7" width="2.4" height="4" rx="1"/><rect x="3.8" y="5" width="2.4" height="6" rx="1"/><rect x="7.6" y="3" width="2.4" height="8" rx="1"/><rect x="11.4" y="1" width="2.4" height="10" rx="1" opacity=".3"/></svg>
+      <i class="p-dot mic"></i><i class="p-dot cam"></i>
+    </span></div>`;
+}
+function appIconHTML(a,t,inf){
+  const bdg=inf&&t&&a.st&&state.uplink?`<span class="pa-bdg">●</span>`:'';
+  return `<span class="pa-ic" style="background:${a.bg}">${ic(a.g,19)}${bdg}</span>`;
+}
+function lockHTML(t){
+  const ntfs=state.feed.filter(e=>e.tid===t.id).slice(0,2);
+  return `<div class="p-lock" data-p-act="unlock">
+    <div class="p-clock-big">--:--</div>
+    <div class="p-date"></div>
+    <div class="p-unl">KETUK UNTUK MEMBUKA</div>
+    <div class="p-lock-ntf">${ntfs.map(e=>`<div class="pn"><div class="pn-h">${ic('msg',10)}${e.type==='MSG'?'PESAN MASUK':e.type==='LOC'?'PEMBAGIAN LOKASI':e.type==='MIC'?'REKAMAN SUARA':'SINKRON BERKAS'}<span>${e.t}</span></div><div class="pn-b">${e.text}</div></div>`).join('')||'<div class="pn"><div class="pn-h">INFO<span>now</span></div><div class="pn-b">Tidak ada notifikasi baru.</div></div>'}</div>
+  </div>`;
+}
+function homeHTML(t,page){
+  const inf=t.status==='INFECTED';
+  const apps=(page===0?P1:P2).map(a=>`<div class="pa" data-p-app="${a.id}">${appIconHTML(a,t,inf)}<span class="pa-n">${a.n}</span></div>`).join('');
+  const dock=DOCK.map(a=>`<div class="pa" data-p-app="${a.id}">${appIconHTML(a,t,inf)}</div>`).join('');
+  return `
+  <div class="p-wall">
+    <div class="p-clock-big" style="font-size:26px;margin-top:2px">--:--</div>
+    <div class="p-date"></div>
+    <div class="p-widget">
+      <div class="p-wx">${ic('sun',18)}<div><b>31°</b><small>Jakarta · Berawan</small></div></div>
+      <div class="p-wx" style="justify-content:center;color:var(--tx3);font-size:9px">Cari aplikasi…</div>
+    </div>
+    <div class="p-appgrid">${apps}</div>
+    <div class="p-dots">
+      <button class="p-dot2 ${page===0?'on':''}" data-p-page="0"></button>
+      <button class="p-dot2 ${page===1?'on':''}" data-p-page="1"></button>
+    </div>
+  </div>
+  <div class="p-dock">${dock}</div>
+  ${homeOverlaysHTML(t)}`;
+}
+function homeOverlaysHTML(t){
+  const inf=t.status==='INFECTED', up=state.uplink;
+  return `<div class="p-notif"></div>
+  <div class="p-hbar" data-p-act="home"></div>
+  ${inf?`<div class="p-comp">COMPROMISED · IMPLANT IMCS AKTIF</div>
+    <div class="p-imcs" data-p-act="sens">IMCS · ${up?'4 STREAMS LIVE':'UPLINK PAUSED'} · KETUK</div>
+    <div class="p-sensors" hidden></div>`
+   :''}
+  ${inf&&!up?`<div class="p-comp" style="bottom:56px;border-color:rgba(255,179,92,.55);background:rgba(255,179,92,.14);color:var(--amber)">UPLINK SUSPENDED BY OPERATOR</div>`:''}`;
+}
+function chatDetailHTML(t,a,idx){
+  const nm=a.id==='sms'&&idx===0&&t.vector&&t.vector.includes('CHIMERA')?'+62 813••••••':CHATC[idx%CHATC.length];
+  const msgs=[0,1,2,3].map(i=>({in:i%2===0,x:MSGPOOL[(idx*3+i)%MSGPOOL.length]}));
+  return `<div class="pa-head" style="background:${a.bg}"><span class="pa-back" data-p-back="1">${ic('back',14)}</span>${nm}</div>
+    <div class="pa-body"><div class="bub-wrap">
+      ${msgs.map(m=>`<div class="bub ${m.in?'in':'out'}">${m.x}<div class="bub-t">${ri(9,21)}:${String(ri(10,59))}</div></div>`).join('')}
+      <div class="bub in">Oke, saya simpan. Nanti kita bahas langsung saja.<div class="bub-t">terbaru</div></div>
+    </div></div>
+    <div class="p-strip">● ISI PERCAKAPAN TERSALIN KE C2 RELAY</div>`;
+}
+function appHTML(t,a){
+  const inf=t.status==='INFECTED';
+  const cOf=n=>['#7FD1FF','#FFB35C','#8CE0B0','#FF9F9F','#D9A9FF','#FFE08A'][n%6];
+  const head=extra=>`<div class="pa-head" style="background:${a.bg}"><span class="pa-back" data-p-back="1">${ic('back',14)}</span>${a.n}${extra||''}</div>`;
+  if(a.cat==='chat'){
+    const rows=[0,1,2,3,4].map(i=>{
+      const nm=a.id==='sms'&&i===0&&t.vector&&t.vector.includes('CHIMERA')?'+62 813••••••':CHATC[i%CHATC.length];
+      const pv=a.id==='sms'&&i===0&&t.vector&&t.vector.includes('CHIMERA')?'Surat panggilan sidang: secure-upload[.]top/d':MSGPOOL[(i+t.id.length)%MSGPOOL.length];
+      return `<div class="pc-row" data-p-chat="${i}"><span class="pc-av" style="background:${cOf(i)}">${nm[0]}</span>
+        <div style="min-width:0"><div class="pc-nm">${nm}</div><div class="pc-pv">${pv}</div></div>
+        <span class="pc-tm">${ri(1,58)} m</span></div>`;
+    }).join('');
+    return head()+`<div class="pa-body">${rows}</div>${inf&&a.st&&state.uplink?`<div class="p-strip">● INTERCEPT LIVE · ${a.st} → C2</div>`:''}`;
+  }
+  if(a.cat==='call'){
+    const rows=[0,1,2,3].map(i=>{
+      const miss=i===0&&t.vector&&t.vector.includes('KARAE');
+      const nm=miss?'+62 21•• (burner)':CHATC[i%CHATC.length];
+      return `<div class="pc-row"><span class="pc-call-ic ${miss?'missed':''}">${ic('phone',12)}</span>
+        <div style="min-width:0"><div class="pc-nm" ${miss?'style="color:var(--red)"':''}>${nm}</div>
+        <div class="pc-pv">${miss?'Panggilan tak terjawab':'Tersambung · '+ri(1,14)+' mnt'}</div></div>
+        <span class="pc-tm" ${miss?'style="color:var(--red)"':''}>${ri(1,59)} m</span></div>`;
+    }).join('');
+    return head()+`<div class="pa-body">${rows}</div>${inf?`<div class="p-strip">● RIWAYAT PANGGILAN DIEKSTRAKSI</div>`:''}`;
+  }
+  if(a.cat==='cam'){
+    const live=inf&&t.camUntil>Date.now();
+    return head()+`<div class="pa-body">${live
+      ?`<div class="p-camlive"><div class="frame"></div><div style="font:600 8px var(--mono);letter-spacing:.14em;color:#3BE58B">FRAME CAPTURE · FRONT CAM</div><div style="font:400 8px var(--mono);color:var(--tx3)">di-stream ke operator — korban tidak sadar</div></div>`
+      :`<div class="p-fotog">${[1,2,3,4,5,6].map(i=>`<div style="background:linear-gradient(${ri(100,260)}deg,hsla(${ri(170,260)},60%,45%,.5),hsla(${ri(20,60)},60%,40%,.5))"></div>`).join('')}</div>`}</div>
+      ${live?`<div class="p-strip">● LIVE STREAM AKTIF → C2</div>`:''}`;
+  }
+  if(a.cat==='map'){
+    const loc=t.lastLoc||`${LOCPLACES[0][1].toFixed(4)}, ${LOCPLACES[0][2].toFixed(4)} — ${LOCPLACES[0][0]}`;
+    return head()+`<div class="pa-body"><div class="p-map">
+      <span class="p-pin"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.5s-6.5-5.6-6.5-10.4a6.5 6.5 0 1 1 13 0C18.5 15.9 12 21.5 12 21.5z"/></svg></span>
+      <div class="p-maptag">POSISI TERAKHIR (implant)<br>${loc}</div></div></div>
+      ${inf&&state.uplink?`<div class="p-strip">● GPS PING TIAP 30 DTK → C2</div>`:''}`;
+  }
+  if(a.cat==='foto'){
+    return head()+`<div class="pa-body"><div class="p-fotog">${[1,2,3,4,5,6,7,8,9].map(i=>`<div style="background:linear-gradient(${ri(80,300)}deg,hsla(${ri(150,320)},55%,48%,.55),hsla(${ri(0,60)},55%,38%,.5))"></div>`).join('')}</div>
+      <div style="padding:8px 12px;font:400 8.5px var(--mono);color:var(--tx3)">${inf?t.d.files+' berkas tersinkron ke C2':'belum tersinkron'}</div></div>`;
+  }
+  if(a.cat==='set'){
+    return head()+`<div class="pa-body">
+     <div class="p-setrow">${ic('info',14)}<span>Tentang perangkat<small>${t.dev} · ${t.os}</small></span></div>
+     <div class="p-setrow">${ic('globe',14)}<span>Jaringan<small>Wi-Fi · seluler</small></span><span class="pv">TERHUBUNG</span></div>
+     <div class="p-setrow ${inf?'alarm':''}">${ic('shield',14)}<span>Manajemen perangkat<small>${inf?'1 profil tak dikenal terpasang':'tidak ada profil'}</small></span><span class="pv">${inf?'1':'0'}</span></div>
+     <div class="p-setrow ${inf?'alarm':''}">${ic('mic',14)}<span>Indikator mikrofon<small>${inf?'aktif tanpa aplikasi terlihat':'normal'}</small></span><span class="pv">${inf?'●':'—'}</span></div></div>`;
+  }
+  if(a.cat==='web'){
+    const lure=t.vector&&t.vector.includes('CHIMERA');
+    return head(`<span style="background:rgba(255,255,255,.2);border-radius:99px;padding:4px 10px;font:400 8.5px var(--mono);flex:1;text-align:left">${lure?'secure-upload[.]top':'google.com'}</span>`)
+      +`<div class="pa-body"><div style="padding:20px 14px;text-align:center">
+      <div style="font:600 11px var(--mono);color:${lure?'var(--red)':'var(--tx2)'};margin-bottom:6px">${lure?'⚠ HALAMAN PEMANCING':'Halaman awal'}</div>
+      <div style="font-size:9.5px;color:var(--tx3);line-height:1.7">${lure?'Lure one-click: satu ketukan pada halaman ini mengeksekusi rantai eksploit WebView.':'Tidak ada aktivitas mencurigakan.'}</div></div></div>`;
+  }
+  if(a.cat==='bank'){
+    return head()+`<div class="pa-body"><div style="padding:18px 14px">
+      <div style="font:600 12px var(--sans);margin-bottom:10px">Masuk ke akun</div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:400 10px var(--mono);color:var(--tx3);margin-bottom:8px">username · terekam</div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:400 10px var(--mono);color:var(--tx3);margin-bottom:10px">password · •••••••• ${inf?'<span style="color:var(--red)">· keylog AKTIF</span>':''}</div>
+      <div style="font-size:8.5px;color:var(--tx3);line-height:1.7">${inf?'Implan merekam ketikan perbankan — PIN &amp; kata sandi tidak aman walau koneksi terenkripsi.':'Tidak ada aktivitas mencurigakan.'}</div></div></div>`;
+  }
+  if(a.cat==='music'){
+    return head()+`<div class="pa-body"><div class="p-card">
+      <div style="display:flex;gap:10px;align-items:center"><div class="pa-ic" style="background:${a.bg}">${ic('music',18)}</div>
+      <div><b style="font-size:11px">Rekaman Dispersi.mp3</b><small style="display:block;font-size:8.5px;color:var(--tx3)">diputar · ${ri(20,80)}%</small></div></div>
+      <div style="height:3px;background:var(--line);border-radius:99px;margin-top:10px"><div style="width:${ri(20,80)}%;height:100%;background:var(--neon);border-radius:99px"></div></div></div></div>
+      ${inf&&state.uplink?`<div class="p-strip">● AUDIO BUFFER TERSALIN → C2</div>`:''}`;
+  }
+  if(a.cat==='tube'){
+    return head()+`<div class="pa-body">${[1,2,3].map(i=>`<div class="pc-row"><div style="width:56px;height:34px;border-radius:7px;background:linear-gradient(120deg,hsl(${ri(180,300)},50%,35%),hsl(${ri(0,50)},50%,30%))"></div>
+      <div style="min-width:0"><div class="pc-nm">Video analisis #${i}</div><div class="pc-pv">${ri(2,90)} rb x ditonton</div></div></div>`).join('')}</div>
+      ${inf?`<div class="p-strip">● RIWAYAT TONTONAN TERSINKRON</div>`:''}`;
+  }
+  if(a.cat==='glim'){
+    return head()+`<div class="pa-body">${[1,2].map(i=>`<div class="p-card"><b style="font-size:10.5px">@${t.name.split(' ')[0].toLowerCase()}_official</b>
+      <div style="height:90px;border-radius:9px;margin:8px 0;background:linear-gradient(140deg,hsl(${ri(200,330)},55%,42%),hsl(${ri(0,60)},55%,32%))"></div>
+      <div style="font:400 8.5px var(--mono);color:var(--tx3)">geotag: ${rand(LOCPLACES)[0]} · diekstrak</div></div>`).join('')}</div>
+      ${inf&&state.uplink?`<div class="p-strip">● GEOTAG SOSIAL DIEKSTRAKSI → C2</div>`:''}`;
+  }
+  if(a.cat==='note'){
+    return head()+`<div class="pa-body">${['Catatan pertemuan 04/06','Daftar pertanyaan wawancara','Password wifi kantor (!!)'].map((n,i)=>`<div class="pc-row"><span class="pc-av" style="background:${cOf(i)}">${ic('note',13)}</span>
+      <div style="min-width:0"><div class="pc-nm">${n}</div><div class="pc-pv">diedit ${ri(1,20)} jam lalu</div></div></div>`).join('')}</div>
+      ${inf?`<div class="p-strip">● KONTEN CATATAN DIEKSTRAKSI</div>`:''}`;
+  }
+  return head()+`<div class="pa-body"><div style="padding:22px;text-align:center;color:var(--tx3);font-size:9.5px">Tidak ada data intersep untuk aplikasi ini.</div></div>`;
+}
+function renderPhoneZone(zone){
+  const t=state.targets.find(x=>x.id===zone.dataset.t); if(!t)return;
+  const scr=zone.querySelector('.p-screen'); if(!scr)return;
+  const st=zone.dataset.state||'lock';
+  if(st==='lock')scr.innerHTML=pStatusHTML()+lockHTML(t)+`<div class="p-notif"></div>`;
+  else if(st==='home')scr.innerHTML=pStatusHTML()+homeHTML(t,+(zone.dataset.page||0));
+  else{
+    const a=appById(zone.dataset.app);
+    scr.innerHTML=pStatusHTML()+(zone.dataset.chat!=null?chatDetailHTML(t,a,+zone.dataset.chat):appHTML(t,a))+`<div class="p-hbar" data-p-act="home"></div><div class="p-notif"></div>`;
+  }
+  paintSensors(zone);
+}
+function paintSensors(zone){
+  const t=state.targets.find(x=>x.id===zone.dataset.t); if(!t)return;
+  const inf=t.status==='INFECTED', up=state.uplink, camLive=inf&&t.camUntil>Date.now();
+  const mic=zone.querySelector('.p-dot.mic'), cam=zone.querySelector('.p-dot.cam');
+  if(mic)mic.classList.toggle('show',inf&&up);
+  if(cam)cam.classList.toggle('show',camLive);
+  const sens=zone.querySelector('.p-sensors');
+  if(!sens)return;
+  sens.hidden=(zone.dataset.state!=='home')||zone.dataset.sens==='0';
+  if(!inf){sens.hidden=true;return;}
+  const rows=[
+    ['MICROPHONE',up?'LIVE':'PAUSED',up,''],
+    ['CAMERA',camLive?'CAPTURE':'IDLE',camLive,'green'],
+    ['LOCATION',up?'LIVE':'PAUSED',up,''],
+    [(platOf(t.os)==='iOS'||platOf(t.os)==='MAC')?'PASTEBOARD':'KEYSTROKES',up?'SYNC':'PAUSED',up,''],
+  ];
+  sens.innerHTML='<div class="s-title">IMPLANT VIEW — SENSOR</div>'+rows.map(r=>
+    `<div class="s-row ${r[2]?'on':''}"><span>${r[0]}</span><span class="st ${r[3]}">${r[2]?'●':'○'} ${r[1]}</span></div>`).join('');
+}
+function paintPhones(){ $$('.phone-zone').forEach(renderPhoneZone); }
+function phoneFlash(){ $$('.p-flash').forEach(f=>{f.classList.remove('go');void f.offsetWidth;f.classList.add('go');}); }
+function phoneNotif(from,text,dur=3800){
+  $$('.p-notif').forEach(n=>{
+    n.insertAdjacentHTML('afterbegin',`<div class="pn"><div class="pn-h">${ic('msg',11)}${from}<span>now</span></div><div class="pn-b">${text}</div></div>`);
+    clearTimeout(n._t); n._t=setTimeout(()=>{const f=n.querySelector('.pn'); if(f)f.remove();},dur);
+  });
+}
+function phoneHTML(t){
+  return `<div class="phone-zone" data-t="${t.id}" data-state="lock" data-page="0">
+    <div class="phone"><div class="p-screen"></div><button class="p-power" title="Kunci / buka"></button></div>
+    <div class="phone-cap p-name"></div>
+    <div class="phone-cap">Ketuk layar kunci → buka. Ketuk ikon aplikasi, chat, dan titik halaman. Tombol samping = kunci. Titik <b>oranye</b> = mikrofon · <b style="color:var(--ok)">hijau</b> = kamera.</div>
+  </div>`;
+}
+document.addEventListener('click',e=>{
+  const zone=e.target.closest('.phone-zone'); if(!zone)return;
+  const act=e.target.closest('[data-p-act]');
+  if(act){
+    const a=act.dataset.pAct;
+    if(a==='unlock'||a==='home'){zone.dataset.state='home';zone.dataset.chat='';renderPhoneZone(zone);}
+    if(a==='sens'){zone.dataset.sens=zone.dataset.sens==='0'?'1':'0';paintSensors(zone);}
+    return;
+  }
+  if(e.target.closest('.p-power')){
+    zone.dataset.state=zone.dataset.state==='lock'?'home':'lock';
+    zone.dataset.chat=''; renderPhoneZone(zone); return;
+  }
+  const pg=e.target.closest('[data-p-page]');
+  if(pg){zone.dataset.page=pg.dataset.pPage;renderPhoneZone(zone);return;}
+  const chat=e.target.closest('[data-p-chat]');
+  if(chat){zone.dataset.chat=chat.dataset.pChat;renderPhoneZone(zone);return;}
+  const bk=e.target.closest('[data-p-back]');
+  if(bk){zone.dataset.chat='';renderPhoneZone(zone);return;}
+  const pa=e.target.closest('[data-p-app]');
+  if(pa){zone.dataset.state='app';zone.dataset.app=pa.dataset.pApp;zone.dataset.chat='';renderPhoneZone(zone);return;}
+});
+
+/* ================= BOTTOM SHEET ================= */
+const sroot=$('#sheet-root');
+function openSheet(html){
+  sroot.innerHTML=`<div class="sh-back"></div><div class="sheet">${html}</div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sroot.classList.add('open')));
+  sroot.querySelector('.sh-back').onclick=closeSheet;
+  sroot.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeSheet);
+}
+function closeSheet(){
+  if(!sroot.classList.contains('open'))return;
+  sroot.classList.remove('open');
+  setTimeout(()=>{sroot.innerHTML='';},340);
+}
+function sheetFrame(title,body){
+  return `<div class="sh-handle"></div>
+    <div class="sh-head"><h3>${title}</h3><button class="x" data-close>${ic('x',16)}</button></div>
+    <div class="sh-body">${body}</div>`;
+}
+function openTargetSheet(id){
+  const t=state.targets.find(x=>x.id===id); if(!t)return;
+  state.sel=id;
+  const inf=t.status==='INFECTED', isLost=t.status==='LOST', up=state.uplink;
+  const fl=k=>(t.flashType===k&&Date.now()-t.flashAt<1500)?'fl':'';
+  openSheet(sheetFrame(t.id,`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <div style="flex:1"><b style="font:600 13px var(--sans)">${t.name}</b><div style="font-size:11px;color:var(--tx3)">${t.role}</div></div>
+      ${pillHTML(t.status)}
+    </div>
+    ${isLost?`<p style="font-size:11.5px;color:var(--amber)">Beacon hilang — implant menunggu perangkat kembali online (pemulihan otomatis).</p>`:''}
+    <dl class="d-grid">
+      <div><dt>Perangkat</dt><dd>${t.dev}</dd></div>
+      <div><dt>Sistem</dt><dd>${t.os}</dd></div>
+      <div><dt>Nomor</dt><dd><span class="redact" title="fiktif">${t.phone}</span></dd></div>
+      <div><dt>Platform</dt><dd>${platLabel(t.os)}</dd></div>
+      <div><dt>Vektor</dt><dd>${inf&&t.vector?t.vector.split(' · ')[0]:'—'}</dd></div>
+      <div><dt>Uplink</dt><dd class="${inf?(up?'c-ok':'c-warn'):''}">${inf?(up?'AKTIF':'DISPENS'):'—'}</dd></div>
+    </dl>
+    <div class="harv">
+      <div class="${fl('MSG')}"><b>${t.d.msgs.toLocaleString('id-ID')}</b><span>PESAN</span></div>
+      <div class="${fl('MIC')}"><b>${t.d.rec.toLocaleString('id-ID')}</b><span>REKAMAN</span></div>
+      <div class="${fl('LOC')}"><b>${t.d.loc.toLocaleString('id-ID')}</b><span>LOKASI</span></div>
+      <div class="${fl('CAM')||fl('FILE')}"><b>${t.d.files.toLocaleString('id-ID')}</b><span>BERKAS</span></div>
+    </div>
+    <div class="act-grid">
+      ${!inf&&!isLost?`<button class="btn pri rip" id="t-deploy">${ic('zap',15)} Deploy</button>`
+        :inf?`<button class="btn rip" id="t-mirror">${ic('phone',15)} Mirror</button>
+          <button class="btn rip" id="t-report">${ic('report',15)} Report</button>
+          <button class="btn rip" id="t-uplink">${ic(up?'pause':'radio',15)} ${up?'Cut Uplink':'Resume'}</button>`
+        :`<button class="btn gh" disabled>${ic('clock',15)} Menunggu…</button>`}
+      <button class="btn dng rip" id="t-purge">${ic('trash',15)} Purge</button>
+    </div>`));
+  const b=id=>sroot.querySelector(id);
+  if(b('#t-deploy'))b('#t-deploy').onclick=()=>sheetVector(t);
+  if(b('#t-mirror'))b('#t-mirror').onclick=()=>sheetMirror(t);
+  if(b('#t-report'))b('#t-report').onclick=()=>{closeSheet();openOperation(t,null,true);};
+  if(b('#t-uplink'))b('#t-uplink').onclick=()=>{toggleUplink(false);openTargetSheet(t.id);};
+  b('#t-purge').onclick=()=>sheetPurge(t);
+}
+function sheetMirror(t){
+  const rows=state.feed.filter(e=>e.tid===t.id).slice(0,6);
+  openSheet(sheetFrame('Device Mirror — '+t.id,`
+    ${phoneHTML(t)}
+    <div class="card mini-feed" style="margin:10px 0 0">
+      <div class="c-head"><span>INTERSEP TERBARU</span></div>
+      ${rows.length?rows.map(feedItemHTML).join(''):'<div class="empty">Belum ada intersep.</div>'}
+    </div>`));
+  const zone=sroot.querySelector('.phone-zone');
+  zone.dataset.state='home';
+  zone.querySelector('.p-name').textContent=`${t.dev} · ${t.os}`;
+  renderPhoneZone(zone);
+  sroot.querySelectorAll('.fi').forEach(f=>f.onclick=()=>{closeSheet();openTargetSheet(f.dataset.tid);});
+}
+function sheetVector(t){
+  const opts=vectorsFor(t.os).map(n=>[n,VECS[n]]);
+  openSheet(sheetFrame('Pilih Vektor — '+t.id,`
+    <p>Pilih rantai eksploitasi untuk <b>${t.dev}</b>. <b style="color:var(--red)">ZERO-CLICK</b> tidak butuh interaksi korban sama sekali.</p>
+    ${opts.map(([n,v])=>`<button class="vec rip" data-vec="${n}">
+      <span class="v-top"><span class="v-name">${n}</span>
+      <span class="v-tag ${v.tag==='ZERO-CLICK'?'zero':v.tag==='ONE-CLICK'?'one':'imp'}">${v.tag}</span>
+      <span class="v-plat">${v.plat}</span></span>
+      <span class="v-desc" style="display:block">${v.desc}</span>
+      <span class="v-ref" style="display:block">${v.ref} · keberhasilan: ${v.succ}</span>
+    </button>`).join('')}`));
+  sroot.querySelectorAll('[data-vec]').forEach(b=>b.onclick=()=>{
+    closeSheet(); setTimeout(()=>openOperation(t,b.dataset.vec),200);
+  });
+}
+function sheetAdd(){
+  openSheet(sheetFrame('Tambah Target',`
+    <div class="field"><label>KODE TARGET</label><input id="f-code" placeholder="mis. SIGMA-4" maxlength="14"></div>
+    <div class="field"><label>NAMA IDENTITAS (FIKTIF)</label><input id="f-name" placeholder="mis. Dimas Prakoso"></div>
+    <div class="field"><label>PERAN / PROFIL</label><input id="f-role" placeholder="mis. Analis kebijakan"></div>
+    <div class="field"><label>PERANGKAT (35 MODEL)</label><select id="f-dev">${DEVCAT.map(d=>`<option value="${d.dev}|${d.os}">${d.dev} — ${d.os}</option>`).join('')}</select></div>
+    <div class="m-act"><button class="btn gh rip" data-close>Batal</button>
+      <button class="btn pri rip" id="f-save">${ic('plus',15)} Tambahkan</button></div>`));
+  sroot.querySelector('#f-save').onclick=()=>{
+    const code=sroot.querySelector('#f-code').value.trim().toUpperCase().replace(/\s+/g,'-');
+    const name=sroot.querySelector('#f-name').value.trim(), role=sroot.querySelector('#f-role').value.trim()||'—';
+    const [dev,os]=sroot.querySelector('#f-dev').value.split('|');
+    if(!code||!name){toast('Kode target dan nama wajib diisi.','bad');return;}
+    if(state.targets.some(t=>t.id===code)){toast('Kode target sudah dipakai.','bad');return;}
+    state.targets.push({id:code,name,role,dev,os,phone:'+62 8'+ri(10,99)+' '+ri(1000,9999)+' '+ri(1000,9999),
+      status:'CLEAN',d:{msgs:0,rec:0,loc:0,files:0}});
+    log('INFO','VAULT',`target ${code} ditambahkan ke vault`);
+    toast(code+' ditambahkan — status CLEAN.','ok');
+    closeSheet(); renderTargets(); renderHomeLive(); radarSeed();
+  };
+}
+function sheetPurge(t){
+  openSheet(sheetFrame('Purge Target',`
+    <p>Hapus <b class="mono">${t.id}</b> (${t.name}) dari vault? ${t.status==='INFECTED'?'Implant akan di-wipe dan uplink diputus.':''}</p>
+    <p style="font-size:11px;color:var(--tx3)">Hanya memengaruhi data simulasi lokal.</p>
+    <div class="m-act"><button class="btn gh rip" data-close>Batal</button>
+      <button class="btn dng rip" id="p-yes">${ic('trash',15)} Hapus</button></div>`));
+  sroot.querySelector('#p-yes').onclick=()=>{
+    if(state.busy){toast('Proses lain sedang berjalan.','bad');return;}
+    state.targets=state.targets.filter(x=>x.id!==t.id);
+    log('WARN','VAULT',`target ${t.id} di-purge`);
+    toast(t.id+' dihapus dari vault.','bad');
+    closeSheet(); renderTargets(); renderHomeLive(); radarSeed();
+  };
+}
+function sheetArsenal(){
+  openSheet(sheetFrame('Arsenal Eksploit',`
+    <p style="margin-bottom:14px">Katalog disusun dari dokumentasi publik (Citizen Lab, Amnesty Tech, advisories vendor). Tidak ada kode eksploitasi — hanya deskripsi. Ketuk untuk detail.</p>
+    ${EXPLOITS.map(e=>`<button class="vec rip">
+      <span class="v-top"><span class="v-name">${e.name}</span>
+      <span class="v-tag ${e.tag==='ZERO-CLICK'?'zero':e.tag==='ONE-CLICK'?'one':'imp'}">${e.tag}</span>
+      <span class="v-plat">${e.plat}</span></span>
+      <span class="v-desc" style="display:block">${e.desc}</span>
+      <span class="v-ref" style="display:block">${e.ref}</span>
+      <span class="ex-det">${e.detail}</span>
+    </button>`).join('')}`));
+  sroot.querySelectorAll('.vec').forEach(v=>v.onclick=()=>v.classList.toggle('open'));
+}
+function sheetAbout(){
+  openSheet(sheetFrame('Tentang Simulasi',`
+    <p><b style="color:var(--tx)">Pegasus Operator Console</b> adalah rekonstruksi fiktif antarmuka operator spyware komersial untuk edukasi keamanan digital. Semua nama, nomor, pesan, dan koordinat adalah dummy yang dibuat lokal — tidak ada kode berbahaya, tidak ada permintaan jaringan.</p>
+    <p><b style="color:var(--tx)">Coba:</b> Vault → ketuk target bersih → Deploy. Mirror: buka kunci layar, jelajahi aplikasi. Radar: Proximity Scan. Vault berubah sendiri setiap beberapa detik.</p>
+    <p style="color:var(--tx)"><b>Pelajaran keamanan nyata:</b></p>
+    <ul class="protect">
+      <li>${ic('check',15)} Aktifkan <b>Lockdown Mode</b> (iOS) bila Anda berisiko tinggi — dirancang khusus menangkal serangan seperti FORCEDENTRY.</li>
+      <li>${ic('check',15)} Perbarui OS &amp; aplikasi secepatnya; zero-click hanya mati lewat patch.</li>
+      <li>${ic('check',15)} Waspadai titik oranye (mikrofon) / hijau (kamera) yang menyala tanpa alasan.</li>
+      <li>${ic('check',15)} Enkripsi pesan tidak menolong jika perangkat itu sendiri dikompromikan — keylogger &amp; mikrofon bekerja di atas enkripsi.</li>
+    </ul>
+    <div class="m-act"><button class="btn dng rip" id="btn-logout">${ic('logout',15)} Keluar Sesi</button></div>
+    <div class="m-src">SUMBER: Citizen Lab — FORCEDENTRY (2021) · Amnesty Tech — Pegasus Project (2021). Tidak berafiliasi dengan pihak mana pun.</div>`));
+  sroot.querySelector('#btn-logout').onclick=()=>{closeSheet();doLogout();};
+}
+ $('#btn-about').onclick=sheetAbout;
+
+/* ================= RADAR ================= */
+const radarC=$('#radar'), rctx=radarC.getContext('2d');
+let radSweep=0, radRAF=null, radBoost=0;
+function radarSeed(){
+  state.radBlips=[];
+  state.targets.slice(0,14).forEach((t,i)=>{
+    state.radBlips.push({label:t.id,kind:t.status==='INFECTED'?'tgt':'idle',t,
+      r:.18+((i*.37)%1)*.6, ang:(i*2.399)%(Math.PI*2), glow:0, ping:0,
+      av:(Math.random()-.5)*.004, rv:(Math.random()-.5)*.003, trail:[], seen:ago(ri(3,120))});
+  });
+  ['UNK-01','UNK-02','UNK-03','WIFI-AP','CELL-TWR'].forEach((l,i)=>{
+    state.radBlips.push({label:l,kind:l.includes('UNK')?'unk':'inf',
+      r:.3+((i*.53)%1)*.62, ang:(i*1.7+0.9)%(Math.PI*2), glow:0, ping:0,
+      av:(Math.random()-.5)*.005, rv:(Math.random()-.5)*.003, trail:[], seen:ago(ri(2,90))});
+  });
+  state.radSel=null;
+}
+function radarStart(){
+  if(!state.radBlips.length)radarSeed();
+  if(radRAF)return;
+  const loop=()=>{
+    if(!$('#scr-radar').classList.contains('on')){radRAF=null;return;}
+    radSweep+=(0.022+radBoost); radBoost*=0.94;
+    if(radSweep>Math.PI*2)radSweep-=Math.PI*2;
+    const cx=320,cy=320,R=294;
+    state.radBlips.forEach(b=>{
+      b.ang+=b.av; b.r+=b.rv;
+      if(b.r<.15){b.r=.15;b.rv*=-1;} if(b.r>.85){b.r=.85;b.rv*=-1;}
+      const x=cx+Math.cos(b.ang)*R*b.r, y=cy+Math.sin(b.ang)*R*b.r;
+      b.trail.push({x,y}); if(b.trail.length>14)b.trail.shift();
+      let d=Math.abs(((radSweep-b.ang)%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+      if(d>Math.PI)d=Math.PI*2-d;
+      if(d<0.05){if(b.glow<.5)b.ping=1;b.glow=1;}
+      b.glow*=0.982; b.ping*=0.94;
+    });
+    radarDraw();
+    radRAF=requestAnimationFrame(loop);
+  };
+  radRAF=requestAnimationFrame(loop);
+}
+function radarStop(){ if(radRAF){cancelAnimationFrame(radRAF);radRAF=null;} }
+function radarDraw(){
+  const S=640,cx=320,cy=320,R=294;
+  rctx.clearRect(0,0,S,S);
+  for(let a=0;a<360;a+=15){
+    const rad=a*Math.PI/180, len=a%90===0?12:a%45===0?8:4;
+    rctx.strokeStyle=`rgba(0,229,255,${a%90===0?.55:a%45===0?.35:.18})`;
+    rctx.lineWidth=1.4;
+    rctx.beginPath();
+    rctx.moveTo(cx+Math.cos(rad)*(R+4),cy+Math.sin(rad)*(R+4));
+    rctx.lineTo(cx+Math.cos(rad)*(R+4+len),cy+Math.sin(rad)*(R+4+len));
+    rctx.stroke();
+  }
+  rctx.strokeStyle='rgba(0,229,255,.3)';rctx.lineWidth=1.6;
+  rctx.beginPath();rctx.arc(cx,cy,R,0,7);rctx.stroke();
+  rctx.strokeStyle='rgba(0,229,255,.18)';rctx.lineWidth=1.2;
+  for(let i=1;i<=3;i++){rctx.beginPath();rctx.arc(cx,cy,R*i/4,0,7);rctx.stroke();}
+  rctx.beginPath();rctx.moveTo(cx-R,cy);rctx.lineTo(cx+R,cy);rctx.moveTo(cx,cy-R);rctx.lineTo(cx,cy+R);rctx.stroke();
+  rctx.font='500 14px IBM Plex Mono';rctx.fillStyle='rgba(0,229,255,.4)';rctx.textAlign='left';
+  for(let i=1;i<=4;i++)rctx.fillText(fmtDist(i/4),cx+5,cy-R*i/4+14);
+  rctx.textAlign='center';rctx.font='600 16px IBM Plex Mono';
+  [['U',cx,cy-R+22],['T',cx+R-14,cy+5],['S',cx,cy+R-14],['B',cx-R+14,cy+5]].forEach(([t,x,y])=>rctx.fillText(t,x,y));
+  rctx.strokeStyle='rgba(0,229,255,.7)';rctx.lineWidth=1.4;
+  rctx.beginPath();rctx.arc(cx,cy,6,0,7);rctx.stroke();
+  rctx.beginPath();rctx.moveTo(cx-10,cy);rctx.lineTo(cx-3,cy);rctx.moveTo(cx+3,cy);rctx.lineTo(cx+10,cy);
+  rctx.moveTo(cx,cy-10);rctx.lineTo(cx,cy-3);rctx.moveTo(cx,cy+3);rctx.lineTo(cx,cy+10);rctx.stroke();
+  state.radBlips.forEach(b=>{
+    if(b.kind==='idle'||b.trail.length<2)return;
+    const col=b.kind==='tgt'?'0,229,255':'255,77,106';
+    b.trail.forEach((p,i)=>{
+      const al=(i/b.trail.length)*.28;
+      rctx.fillStyle=`rgba(${col},${al})`;
+      rctx.beginPath();rctx.arc(p.x,p.y,1.6,0,7);rctx.fill();
+    });
+  });
+  const g=rctx.createRadialGradient(cx,cy,0,cx,cy,R);
+  g.addColorStop(0,'rgba(0,229,255,.12)');g.addColorStop(1,'rgba(0,229,255,0)');
+  rctx.fillStyle=g;rctx.beginPath();rctx.moveTo(cx,cy);
+  rctx.arc(cx,cy,R,radSweep-0.4,radSweep);rctx.closePath();rctx.fill();
+  for(let i=0;i<40;i++){
+    const a=radSweep-i*0.025, al=(1-i/40)*.5;
+    rctx.strokeStyle=`rgba(0,229,255,${al})`;rctx.lineWidth=2;
+    rctx.beginPath();rctx.moveTo(cx,cy);
+    rctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);rctx.stroke();
+  }
+  state.radBlips.forEach(b=>{
+    const x=cx+Math.cos(b.ang)*R*b.r, y=cy+Math.sin(b.ang)*R*b.r;
+    const col=b.kind==='tgt'?'0,229,255':b.kind==='unk'?'255,77,106':'255,179,92';
+    const gl=b.glow;
+    if(b.ping>.05){
+      rctx.strokeStyle=`rgba(${col},${b.ping*.55})`;rctx.lineWidth=1.6;
+      rctx.beginPath();rctx.arc(x,y,7+(1-b.ping)*20,0,7);rctx.stroke();
+    }
+    if(b.kind==='tgt'){
+      rctx.strokeStyle=`rgba(${col},${.5+.4*gl})`;rctx.lineWidth=1.5;
+      rctx.beginPath();rctx.arc(x,y,7+4*gl,0,7);rctx.stroke();
+    }
+    rctx.shadowColor=`rgba(${col},.9)`;rctx.shadowBlur=8+18*gl;
+    rctx.fillStyle=`rgba(${col},${b.kind==='idle'?.55:.95})`;
+    rctx.beginPath();rctx.arc(x,y,b.kind==='tgt'?5:(b.kind==='unk'?4.5:3.5),0,7);rctx.fill();
+    rctx.shadowBlur=0;
+    if(b.kind!=='idle'||gl>.3){
+      rctx.font='500 15px IBM Plex Mono';rctx.textAlign='left';
+      rctx.fillStyle=`rgba(223,242,252,${.55+.45*gl})`;
+      rctx.fillText(b.label,x+10,y+4);
+    }
+  });
+  if(state.radSel!=null){
+    const b=state.radBlips[state.radSel];
+    if(b){
+      const x=cx+Math.cos(b.ang)*R*b.r, y=cy+Math.sin(b.ang)*R*b.r;
+      const s=13+2*Math.sin(Date.now()/300), L=7;
+      rctx.strokeStyle='rgba(255,255,255,.85)';rctx.lineWidth=1.6;
+      [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy])=>{
+        rctx.beginPath();
+        rctx.moveTo(x+sx*s, y+sy*s-sy*L); rctx.lineTo(x+sx*s, y+sy*s); rctx.lineTo(x+sx*s-sx*L, y+sy*s);
+        rctx.stroke();
+      });
+    }
+  }
+}
+function fmtDist(r){
+  const m=r*state.radRange;
+  return m>=1000?(m/1000).toFixed(1)+'K':Math.round(m)+'m';
+}
+function renderRadInfo(){
+  const i=state.radSel, b=state.radBlips[i];
+  if(!b){$('#rad-info').innerHTML='<div class="empty" style="padding:10px 0">Ketuk blip pada radar untuk detail.</div>';return;}
+  const col=b.kind==='tgt'?'var(--neon)':b.kind==='unk'?'var(--red)':'var(--amber)';
+  const kindN=b.kind==='tgt'?'TARGET VAULT':b.kind==='unk'?'TAK DIKENAL':'INFRASTRUKTUR';
+  const bear=Math.round(((b.ang*180/Math.PI)+90+360)%360);
+  $('#rad-info').innerHTML=`
+    <div class="ri-row"><i class="ri-dot" style="background:${col};color:${col}"></i>
+      <span class="ri-name">${b.label}</span><span class="ri-kind" style="color:${col};border-color:${col}">${kindN}</span></div>
+    <div class="ri-grid">
+      <div><span>JARAK</span><b>${fmtDist(b.r)}</b></div>
+      <div><span>BEARING</span><b>${bear}°</b></div>
+      <div><span>SEEN</span><b>${b.seen}</b></div>
+    </div>
+    ${b.t?`<button class="btn sm rip" id="ri-open" style="margin-top:10px">Buka di Vault — ${b.t.id}</button>`:''}`;
+  const ob=$('#ri-open');
+  if(ob)ob.onclick=()=>openTargetSheet(b.t.id);
+}
+radarC.addEventListener('click',e=>{
+  const rect=radarC.getBoundingClientRect(), scale=640/rect.width;
+  const px=(e.clientX-rect.left)*scale, py=(e.clientY-rect.top)*scale;
+  const cx=320,cy=320,R=294;
+  let best=-1,bd=34;
+  state.radBlips.forEach((b,i)=>{
+    const x=cx+Math.cos(b.ang)*R*b.r, y=cy+Math.sin(b.ang)*R*b.r;
+    const d=Math.hypot(px-x,py-y);
+    if(d<bd){bd=d;best=i;}
+  });
+  state.radSel=best>=0?best:null;
+  renderRadInfo();
+});
+ $('#rad-chips').innerHTML=[[500,'500 M'],[2000,'2 KM'],[10000,'10 KM']].map(([v,l])=>
+  `<button class="chip rip ${v===state.radRange?'on':''}" data-r="${v}">${l}</button>`).join('');
+ $('#rad-chips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c)return;
+  state.radRange=+c.dataset.r;
+  $$('#rad-chips .chip').forEach(x=>x.classList.toggle('on',x===c));
+});
+function radAlert(msg){
+  $('#rad-alert-t').textContent=msg;
+  $('#rad-alert').hidden=false;
+  clearTimeout(radAlert._t);
+  radAlert._t=setTimeout(()=>$('#rad-alert').hidden=true,4200);
+}
+ $('#btn-scan').onclick=()=>{
+  radBoost=0.14;
+  $('#rad-status').textContent='SCANNING…';
+  log('INFO','RADAR','proximity scan dipicu operator');
+  setTimeout(()=>{
+    $('#rad-status').textContent='SWEEP AKTIF';
+    const n=state.radBlips.filter(b=>b.label.startsWith('UNK')).length+1;
+    if(n<=8&&Math.random()<.72){
+      state.radBlips.push({label:'UNK-0'+n,kind:'unk',r:.25+Math.random()*.6,ang:Math.random()*Math.PI*2,
+        glow:1,ping:1,av:(Math.random()-.5)*.005,rv:(Math.random()-.5)*.003,trail:[],seen:ago(0)});
+      radAlert('KONTAK BARU · UNK-0'+n);
+      toast(`Perangkat tak dikenal baru: UNK-0${n}.`,'bad');
+      log('WARN','RADAR',`perangkat tak dikenal UNK-0${n} terdeteksi`);
+    } else {
+      toast('Sweep selesai — tidak ada kontak baru.');
+    }
+  },1600);
+};
+
+/* ================= UPLINK ================= */
+function toggleUplink(notify=true){
+  state.uplink=!state.uplink;
+  log(state.uplink?'OK':'WARN','UPLINK',state.uplink?'uplink data dilanjutkan':'uplink data ditangguhkan oleh operator');
+  if(notify)toast(state.uplink?'Uplink dilanjutkan — aliran data kembali mengalir.':'Uplink diputus — aliran data berhenti.');
+  renderStreams(); paintPhones();
+}
+ $('#btn-uplink').onclick=()=>toggleUplink();
+
+/* ================= LAYAR OPERASI ================= */
+const oroot=$('#op-root');
+function openOperation(t,vecName,isReport=false){
+  const vec=vecName?VECS[vecName]:null;
+  oroot.innerHTML=`<div class="op">
+    <div class="op-head">
+      <button class="bk rip" id="op-close">${ic('back',17)}</button>
+      <div class="op-tt"><b>${isReport?'EXTRACTION REPORT':vecName+' → '+t.id}</b>
+        <span>PSCMD-01 · SECURE CHANNEL · AES-256-GCM</span></div>
+      <div class="right"><button id="btn-fast">FAST ×20</button></div>
+    </div>
+    <div class="op-term"><div class="term-body" id="op-termbody"></div></div>
+    <div class="op-phone">${phoneHTML(t)}
+      <div class="op-done" id="op-done" hidden>
+        <button class="btn rip" id="op-mirror">${ic('phone',15)} Mirror</button>
+        <button class="btn pri rip" id="op-ok">${ic('check',15)} Selesai</button>
+      </div>
+    </div>
+  </div>`;
+  oroot.classList.add('open');
+  window.__fast=false;
+  const zone=oroot.querySelector('.phone-zone');
+  zone.querySelector('.p-name').textContent=`${t.dev} · ${t.os}`;
+  renderPhoneZone(zone);
+  const tb=oroot.querySelector('#op-termbody');
+  const fastBtn=oroot.querySelector('#btn-fast');
+  fastBtn.onclick=()=>{window.__fast=!window.__fast;fastBtn.classList.toggle('on',window.__fast);};
+  const finish=()=>{
+    oroot.querySelector('#op-done').hidden=false;
+    oroot.querySelector('#op-close').disabled=false;
+  };
+  oroot.querySelector('#op-close').onclick=()=>{if(!state.busy){oroot.classList.remove('open');oroot.innerHTML='';}};
+  oroot.querySelector('#op-ok').onclick=()=>{oroot.classList.remove('open');oroot.innerHTML='';};
+  oroot.querySelector('#op-mirror').onclick=()=>{oroot.classList.remove('open');oroot.innerHTML='';sheetMirror(t);};
+  async function termLine(s){
+    const el=document.createElement('div'); el.className='tl '+(s.cls||'');
+    const m=s.txt.match(/^(\[[^\]]*\])/), pfx=m?m[1]:'';
+    el.innerHTML=`<span style="opacity:.85">${pfx}</span>`;
+    tb.appendChild(el);
+    const span=document.createElement('span'); el.appendChild(span);
+    const car=document.createElement('i'); car.className='caret'; el.appendChild(car);
+    for(const ch of s.txt.slice(pfx.length)){span.textContent+=ch;if(!window.__fast)await sleep(5+Math.random()*9);}
+    car.remove(); tb.scrollTop=tb.scrollHeight;
+    await sleep(s.d??300);
+  }
+  (async()=>{
+    state.busy=true;
+    oroot.querySelector('#op-close').disabled=true;
+    if(isReport){
+      log('INFO','OP',`extraction report dibuat untuk ${t.id}`);
+      const lines=[
+        {txt:`[*] compiling extraction report :: ${t.id}`,d:450},
+        {txt:`    pesan intersep   : ${t.d.msgs.toLocaleString('id-ID')}`,d:260},
+        {txt:`    rekaman suara    : ${t.d.rec.toLocaleString('id-ID')} klip · ±${(t.d.rec*4/60).toFixed(1)} jam`,d:260},
+        {txt:`    ping lokasi      : ${t.d.loc.toLocaleString('id-ID')}`,d:260},
+        {txt:`    berkas / media   : ${t.d.files.toLocaleString('id-ID')}`,d:260},
+        {txt:'    implant health   : OK · beacon '+$('#c2-ping').textContent,d:300},
+        {txt:'[#] report archived to operator vault',d:200},
+      ];
+      for(const s of lines)await termLine(s);
+      window.__fast=false; state.busy=false; finish(); return;
+    }
+    log('INFO','PSCMD',`deploy ${vecName} dimulai terhadap ${t.id}`);
+    if(vec.notif){
+      phoneNotif(vec.notif.from,vec.notif.text,5200);
+      await sleep(1500);
+      zone.dataset.state='home'; renderPhoneZone(zone);
+    }
+    for(const s of vec.script(t))await termLine(s);
+    t.status='INFECTED';
+    t.vector=`${vecName} · ${vec.ref.split(' · ')[0]}`;
+    t.since=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short'})+' '+fmtT(new Date()).slice(0,5);
+    t.d={msgs:0,rec:0,loc:0,files:0};
+    window.__fast=false; state.busy=false; phoneFlash();
+    zone.dataset.state='home'; zone.dataset.chat=''; renderPhoneZone(zone);
+    log('OK','VAULT',`${t.id} status → INFECTED via ${vecName}`);
+    toast(`${t.id} — implant aktif. Uplink data dimulai.`,'ok');
+    renderTargets(); renderHomeLive(); radarSeed();
+    setTimeout(()=>addFeed(t.id,'LOC','beacon pertama — '+randomText('LOC')),1100);
+    finish();
+  })();
+}
+ $('#v-list').addEventListener('click',e=>{
+  const r=e.target.closest('.tg'); if(r)openTargetSheet(r.dataset.id);
+});
+document.addEventListener('click',e=>{
+  const f=e.target.closest('.fi'); if(!f)return;
+  if(f.closest('#scr-home'))switchScr('streams');
+  if(f.closest('#scr-streams')){state.sel=f.dataset.tid;openTargetSheet(f.dataset.tid);}
+});
+
+/* ================= CHIPS STREAMS ================= */
+const CHIPS=[['ALL','ALL'],['MSG','PESAN'],['MIC','SUARA'],['LOC','LOKASI'],['CAM','KAMERA'],['FILE','BERKAS']];
+ $('#st-chips').innerHTML=CHIPS.map(([v,l],i)=>`<button class="chip rip ${i===0?'on':''}" data-f="${v}">${l}</button>`).join('');
+ $('#st-chips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c)return;
+  state.filter=c.dataset.f;
+  $$('#st-chips .chip').forEach(x=>x.classList.toggle('on',x===c));
+  renderStreams();
+});
+
+/* ================= RIPPLE ================= */
+document.addEventListener('pointerdown',e=>{
+  const t=e.target.closest('.rip'); if(!t)return;
+  const r=t.getBoundingClientRect(), s=Math.max(r.width,r.height)*1.15;
+  const d=document.createElement('i'); d.className='rd';
+  d.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px`;
+  t.appendChild(d); setTimeout(()=>d.remove(),560);
+});
+
+/* ================= LOGIN ================= */
+let failCount=0, lockTimer=null;
+function lgParticles(){
+  const c=$('#lg-canvas'), ctx=c.getContext('2d');
+  c.width=innerWidth;c.height=innerHeight;
+  const ps=Array.from({length:56},()=>({x:Math.random()*c.width,y:Math.random()*c.height,
+    s:.5+Math.random()*1.7,v:.15+Math.random()*.5,a:.1+Math.random()*.5}));
+  const loop=()=>{
+    ctx.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{
+      p.y-=p.v; if(p.y<-4){p.y=c.height+4;p.x=Math.random()*c.width;}
+      ctx.fillStyle=`rgba(0,229,255,${p.a*(0.6+0.4*Math.sin(Date.now()/500+p.x))})`;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();
+    });
+    if(state.loggedIn)return;
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+lgParticles();
+ $('#lg-eye').onclick=()=>{const p=$('#lg-pass');p.type=p.type==='password'?'text':'password';};
+function doLogout(){
+  state.loggedIn=false;
+  $('#login-root').classList.remove('gone');
+  $('#login-root').style.display='flex';
+  $('#lg-pass').value='';
+  $('#lg-err').textContent='';
+  lgParticles();
+  toast('Sesi ditutup. Perangkat dikunci.');
+  log('WARN','SYS','operator session R-77 closed');
+}
+ $('#btn-login').onclick=doLogin;
+ $('#lg-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+ $('#lg-user').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lg-pass').focus();});
+function doLogin(){
+  if(lockTimer)return;
+  const u=$('#lg-user').value.trim(), p=$('#lg-pass').value;
+  if(u.toLowerCase()==='admin'&&p==='admin123'){
+    $('#lg-err').textContent='';
+    $('#btn-login').disabled=true;
+    $('#btn-login').textContent='MEMVERIFIKASI…';
+    setTimeout(()=>{
+      state.loggedIn=true;
+      $('#lg-boot').hidden=false;
+      bootSeq();
+    },600);
+  } else {
+    failCount++;
+    $('#lg-err').textContent=failCount>=3
+      ?'TERLALU BANYAK PERCOBAAN — TUNGGU…'
+      :'KREDENSIAL DITOLAK · percobaan '+failCount+'/3 (fiktif)';
+    const c=$('#lg-card');
+    c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    log('ERR','AUTH','login attempt failed — kredensial salah');
+    if(failCount>=3){
+      let s=10;
+      $('#btn-login').disabled=true;
+      lockTimer=setInterval(()=>{
+        s--;
+        $('#btn-login').textContent='TERKUNCI '+s+' DTK';
+        if(s<=0){
+          clearInterval(lockTimer); lockTimer=null; failCount=0;
+          $('#btn-login').disabled=false;
+          $('#btn-login').textContent='AUTENTIKASI';
+          $('#lg-err').textContent='';
+        }
+      },1000);
+    }
+  }
+}
+async function bootSeq(){
+  const pre=$('#lg-bootlog');
+  const lines=['[AUTH] operator Admin · clearance TIER-1 … OK',
+    `[SYS] mounting encrypted vault … ${state.targets.length} target`,
+    '[NET] C2 relay ams3 handshake … OK',
+    '[IMCS] decrypting intercept streams … OK',
+    '[RADAR] proximity sensors … ARMED',
+    'SELAMAT DATANG, OPERATOR.'];
+  pre.innerHTML='';
+  for(const l of lines){
+    const el=document.createElement('div'); pre.appendChild(el);
+    for(const ch of l){el.textContent+=ch;await sleep(7);}
+    await sleep(110);
+  }
+  await sleep(480);
+  $('#login-root').classList.add('gone');
+  setTimeout(()=>{$('#login-root').style.display='none';},650);
+  $('#btn-login').disabled=false;
+  $('#btn-login').textContent='AUTENTIKASI';
+  state.t0=Date.now();
+  log('OK','SYS','operator session R-77 opened (TIER-1)');
+  toast('Selamat datang, Admin — clearance TIER-1.','ok');
+}
+
+/* ================= JAM / PING / LOOP ================= */
+function tickClock(){
+  const d=new Date(), hm=d.toTimeString().slice(0,5);
+  $('#sb-clock').textContent=hm;
+  $$('.p-clock,.p-clock-big').forEach(el=>el.textContent=hm);
+  $$('.p-date').forEach(el=>el.textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'}));
+  renderHomeLive();
+}
+setInterval(tickClock,1000);
+setInterval(()=>{
+  const p=ri(62,148);
+  $('#c2-ping').textContent=p+' ms';
+  $('#c2-ping').style.color=p>120?'var(--amber)':'';
+},2400);
+setInterval(()=>{ if(state.loggedIn)simTick(); },3300);
+setInterval(()=>{
+  state.series.push(state.events-lastSnap); state.series.shift();
+  lastSnap=state.events; drawSpark();
+},4000);
+
+/* ================= SEED ================= */
+[
+ {s:36, tid:'AGUSTI-7', ty:'MSG', x:'Rapat redaksi dipindah ke 15.00, ruang B.'},
+ {s:74, tid:'AGUSTI-7', ty:'LOC', x:'-6.2088, 106.8456 — Sudirman CBD · 12 km/h · akurasi 8 m'},
+ {s:121,tid:'LENTARA-3',ty:'MIC', x:'Voice capture 00:47 — Ruang rapat tertutup · 2 pembicara'},
+ {s:158,tid:'DELTA-2', ty:'FILE',x:'FILE_SYNC Draft-Narasi-V2.docx — 1.8 MB · sha256 tersensor'},
+ {s:210,tid:'WARTA-5', ty:'LOC', x:'-6.2426, 106.7996 — Kebayoran Baru · 5 km/h · akurasi 11 m'},
+ {s:262,tid:'AGUSTI-7', ty:'MSG', x:'Jangan kirim dokumennya lewat sini. Pakai kanal yang aman.'},
+].forEach(f=>state.feed.unshift({id:uid(),t:ago(f.s),tid:f.tid,type:f.ty,text:f.x}));
+[
+ {s:340,l:['INFO','SYS','console boot · build 11841 · region ams3']},
+ {s:335,l:['OK','SYS','vault sync complete — 16 target, 4 implant']},
+ {s:290,l:['OK','IMCS','beacon check AGUSTI-7 OK · 84 ms']},
+ {s:264,l:['OK','IMCS','beacon check LENTARA-3 OK · 107 ms']},
+ {s:180,l:['INFO','INTAKE','3 kandidat baru menunggu triase']},
+ {s:95, l:['WARN','PSCMD','SAHARA-1 deployment attempt #2 FAILED — device offline']},
+].forEach(x=>state.logs.push({t:ago(x.s),level:x.l[0],src:x.l[1],msg:x.l[2]}));
+state.logs.reverse();
+
+renderHome(); renderTargets(); renderStreams(); renderLogs();
+radarSeed(); tickClock();
+</script>
+</body>
+</html>
