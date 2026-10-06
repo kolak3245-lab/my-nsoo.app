@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="com.pagasuspywareeapp" version="1.0.0" android-versionCode="1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+  <name>Pegasus Spyware</name>
+  <description>Pegasus Spyware</description>
+  <content src="index.html" />
+  <access origin="*" />
+  <allow-navigation href="*" />
+  <allow-intent href="*" />
+  <preference name="AndroidXEnabled" value="true" />
+  <preference name="AndroidMinSdkVersion" value="24" />
+  <preference name="AndroidTargetSdkVersion" value="34" />
+  <preference name="BackgroundColor" value="0xff0c0f12" />
+  <platform name="android">
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest">
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.CAMERA" />
+      <uses-permission android:name="android.permission.RECORD_AUDIO" />
+      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+      <uses-permission android:name="android.permission.READ_CONTACTS" />
+      <uses-permission android:name="android.permission.BLUETOOTH" />
+      <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+      <uses-permission android:name="android.permission.VIBRATE" />
+    </edit-config>
+    <icon src="res/icon.png" />
+    <splash src="res/screen/android/splash-land-ldpi.png" density="land-ldpi" />
+    <splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi" />
+    <splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi" />
+    <splash src="res/screen/android/splash-port-mdpi.png" density="port-mdpi" />
+    <splash src="res/screen/android/splash-land-hdpi.png" density="land-hdpi" />
+    <splash src="res/screen/android/splash-port-hdpi.png" density="port-hdpi" />
+    <splash src="res/screen/android/splash-land-xhdpi.png" density="land-xhdpi" />
+    <splash src="res/screen/android/splash-port-xhdpi.png" density="port-xhdpi" />
+  </platform>
+  <plugin name="cordova-plugin-camera" />
+  <plugin name="cordova-plugin-geolocation" />
+  <plugin name="cordova-plugin-file" />
+  <plugin name="cordova-plugin-device" />
+  <plugin name="cordova-plugin-inappbrowser" />
+  <plugin name="cordova-plugin-vibration" />
+  <plugin name="cordova-plugin-network-information" />
+  <plugin name="cordova-plugin-media-capture" />
+  <plugin name="cordova-plugin-splashscreen" spec="^6.0.2" />
+  <preference name="AutoHideSplashScreen" value="true" />
+  <preference name="SplashScreenDelay" value="2000" />
+  <preference name="ShowSplashScreenSpinner" value="false" />
+</widget>
